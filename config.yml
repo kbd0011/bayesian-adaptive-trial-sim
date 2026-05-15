@@ -1,0 +1,34 @@
+trial:
+  primary_endpoint: time_to_progression
+  accrual_rate_per_month: 12
+  total_followup_months: 24
+  max_n: 120
+  allocation_ratio_fixed: [1, 1]   # control : experimental
+  baseline_event_rate: 0.30        # annual hazard, control arm
+
+design:
+  alpha_one_sided: 0.025
+  target_power: 0.80
+  interim_information_fraction: 0.30
+  design_alternative_hr: 0.70        # design target HR; used for interim event-target calc
+  futility_boundary: 0.20          # P(hr < 0.7 | data) at interim
+
+scenarios:
+  - name: "null"
+    hr: 1.00
+  - name: harmful
+    hr: 1.15
+  - name: mild_effect
+    hr: 0.85
+  - name: moderate_effect
+    hr: 0.75
+  - name: strong_effect
+    hr: 0.65
+  - name: very_strong_effect
+    hr: 0.55
+
+simulation:
+  n_sims_full: 1000
+  n_sims_ci: 100
+  seed: 20260513
+  parallel_workers: 4

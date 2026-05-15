@@ -1,0 +1,20 @@
+project:
+  type: default
+
+execute:
+  freeze: auto
+  echo: false
+  warning: false
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    theme: cosmo
+  pdf:
+    toc: true
+    toc-depth: 3
+    documentclass: article
+    geometry:
+      - margin=1in
