@@ -1,8 +1,6 @@
 {
   "bioconductor.version": null,
-  "external.libraries": [
-    "/Library/Frameworks/R.framework/Resources/library"
-  ],
+  "external.libraries": [],
   "ignored.packages": [
     "KernSmooth",
     "MASS",
