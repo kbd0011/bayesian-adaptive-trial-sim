@@ -1,0 +1,80 @@
+name: Publish report to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required so the workflow can push to the gh-pages branch.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxml2-dev \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libfontconfig1-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libfreetype6-dev \
+            libpng-dev \
+            libtiff5-dev \
+            libjpeg-dev
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.1'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: '1.5.57'
+
+      - uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
+
+      # The report's exec-summary text quotes 1,000 sims per scenario; run the
+      # full pipeline at that scale so the deployed report's numbers match the
+      # prose. ~3 min added vs --n-sims 100; trade-off is worth the
+      # internal consistency.
+      - name: Generate pipeline outputs
+        run: |
+          Rscript R/01_design_params.R
+          Rscript R/04_run_all_sims.R --n-sims 1000 --workers 2
+          Rscript R/05_oc_compute.R
+          Rscript R/06_oc_plots.R
+          Rscript R/07_tcga_data.R
+          Rscript R/08_tcga_km.R
+          Rscript R/09_tcga_cox.R
+          Rscript R/10_tcga_bayes_aft.R
+
+      - name: Render Quarto reports
+        run: |
+          quarto render report/index.qmd --to html
+          quarto render report/sap_section.qmd --to html
+
+      - name: Publish report/ to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./report
+          publish_branch: gh-pages
+          # Preserve report/index.pdf alongside the HTML
+          keep_files: false
+          force_orphan: true

@@ -1,0 +1,37 @@
+{
+  "bioconductor.version": null,
+  "external.libraries": [
+    "/Library/Frameworks/R.framework/Resources/library"
+  ],
+  "ignored.packages": [
+    "KernSmooth",
+    "MASS",
+    "Matrix",
+    "boot",
+    "class",
+    "cluster",
+    "codetools",
+    "foreign",
+    "lattice",
+    "mgcv",
+    "nlme",
+    "nnet",
+    "rpart",
+    "spatial",
+    "survival"
+  ],
+  "package.dependency.fields": [
+    "Imports",
+    "Depends",
+    "LinkingTo"
+  ],
+  "ppm.enabled": null,
+  "ppm.ignored.urls": [],
+  "r.version": null,
+  "snapshot.type": "implicit",
+  "use.cache": true,
+  "vcs.ignore.cellar": true,
+  "vcs.ignore.library": true,
+  "vcs.ignore.local": true,
+  "vcs.manage.ignores": true
+}

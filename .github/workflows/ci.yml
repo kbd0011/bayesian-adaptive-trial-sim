@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      R_KEEP_PKG_SOURCE: yes
+      RSPM: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxml2-dev \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libfontconfig1-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libfreetype6-dev \
+            libpng-dev \
+            libtiff5-dev \
+            libjpeg-dev
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.1'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: '1.5.57'
+
+      - uses: r-lib/actions/setup-renv@v2
+        with:
+          # Installs renv at the version in renv.lock, runs renv::restore(),
+          # and caches the resulting library keyed on the lockfile hash.
+          # Handles both CRAN and Bioconductor packages.
+          cache-version: 1
+
+      - name: Stan smoke test
+        run: |
+          library(rstan)
+          example(stan_model, package = "rstan", run.donttest = FALSE)
+        shell: Rscript {0}
+
+      - name: Compute design parameters (R/01)
+        run: Rscript R/01_design_params.R
+
+      - name: Run reduced simulation set (R/04, --n-sims 100)
+        run: Rscript R/04_run_all_sims.R --n-sims 100 --workers 2
+
+      - name: Compute operating characteristics (R/05)
+        run: Rscript R/05_oc_compute.R
+
+      - name: Render OC plots (R/06)
+        run: Rscript R/06_oc_plots.R
+
+      - name: TCGA pipeline (R/07-R/10)
+        run: |
+          Rscript R/07_tcga_data.R
+          Rscript R/08_tcga_km.R
+          Rscript R/09_tcga_cox.R
+          Rscript R/10_tcga_bayes_aft.R
+
+      - name: Run unit tests
+        run: Rscript tests/testthat.R
+
+      - name: Render Quarto reports
+        run: |
+          quarto render report/index.qmd --to html
+          quarto render report/sap_section.qmd --to html
+
+      - name: Upload pipeline outputs as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-outputs
+          path: |
+            outputs/figures/
+            outputs/tables/
+            report/_output/
+          retention-days: 14
