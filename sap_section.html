@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Cris Taylor">
+<meta name="dcterms.date" content="2026-05-15">
+
+<title>Statistical Analysis Plan (Mock Section)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="sap_section_files/libs/clipboard/clipboard.min.js"></script>
+<script src="sap_section_files/libs/quarto-html/quarto.js"></script>
+<script src="sap_section_files/libs/quarto-html/popper.min.js"></script>
+<script src="sap_section_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="sap_section_files/libs/quarto-html/anchor.min.js"></script>
+<link href="sap_section_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="sap_section_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="sap_section_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="sap_section_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="sap_section_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="sap_section_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="sap_section_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#study-objectives" id="toc-study-objectives" class="nav-link active" data-scroll-target="#study-objectives">1. Study objectives</a>
+  <ul class="collapse">
+  <li><a href="#primary-objective" id="toc-primary-objective" class="nav-link" data-scroll-target="#primary-objective">1.1 Primary objective</a></li>
+  <li><a href="#secondary-objectives" id="toc-secondary-objectives" class="nav-link" data-scroll-target="#secondary-objectives">1.2 Secondary objectives</a></li>
+  </ul></li>
+  <li><a href="#primary-estimand-ich-e9r1" id="toc-primary-estimand-ich-e9r1" class="nav-link" data-scroll-target="#primary-estimand-ich-e9r1">2. Primary estimand (ICH E9(R1))</a></li>
+  <li><a href="#endpoints" id="toc-endpoints" class="nav-link" data-scroll-target="#endpoints">3. Endpoints</a>
+  <ul class="collapse">
+  <li><a href="#primary-endpoint" id="toc-primary-endpoint" class="nav-link" data-scroll-target="#primary-endpoint">3.1 Primary endpoint</a></li>
+  <li><a href="#key-secondary-endpoints" id="toc-key-secondary-endpoints" class="nav-link" data-scroll-target="#key-secondary-endpoints">3.2 Key secondary endpoints</a></li>
+  <li><a href="#safety-endpoints" id="toc-safety-endpoints" class="nav-link" data-scroll-target="#safety-endpoints">3.3 Safety endpoints</a></li>
+  </ul></li>
+  <li><a href="#statistical-hypotheses" id="toc-statistical-hypotheses" class="nav-link" data-scroll-target="#statistical-hypotheses">4. Statistical hypotheses</a>
+  <ul class="collapse">
+  <li><a href="#primary-hypothesis" id="toc-primary-hypothesis" class="nav-link" data-scroll-target="#primary-hypothesis">4.1 Primary hypothesis</a></li>
+  </ul></li>
+  <li><a href="#analysis-populations" id="toc-analysis-populations" class="nav-link" data-scroll-target="#analysis-populations">5. Analysis populations</a></li>
+  <li><a href="#sample-size-justification" id="toc-sample-size-justification" class="nav-link" data-scroll-target="#sample-size-justification">6. Sample-size justification</a>
+  <ul class="collapse">
+  <li><a href="#phase-ii-screening-rationale" id="toc-phase-ii-screening-rationale" class="nav-link" data-scroll-target="#phase-ii-screening-rationale">6.1 Phase II screening rationale</a></li>
+  <li><a href="#demonstrated-operating-characteristics" id="toc-demonstrated-operating-characteristics" class="nav-link" data-scroll-target="#demonstrated-operating-characteristics">6.2 Demonstrated operating characteristics</a></li>
+  </ul></li>
+  <li><a href="#primary-analysis-method" id="toc-primary-analysis-method" class="nav-link" data-scroll-target="#primary-analysis-method">7. Primary analysis method</a>
+  <ul class="collapse">
+  <li><a href="#group-sequential-test" id="toc-group-sequential-test" class="nav-link" data-scroll-target="#group-sequential-test">7.1 Group-sequential test</a></li>
+  </ul></li>
+  <li><a href="#adaptive-design-procedures" id="toc-adaptive-design-procedures" class="nav-link" data-scroll-target="#adaptive-design-procedures">8. Adaptive design procedures</a>
+  <ul class="collapse">
+  <li><a href="#interim-analysis" id="toc-interim-analysis" class="nav-link" data-scroll-target="#interim-analysis">8.1 Interim analysis</a></li>
+  <li><a href="#futility-stopping-rule" id="toc-futility-stopping-rule" class="nav-link" data-scroll-target="#futility-stopping-rule">8.2 Futility stopping rule</a></li>
+  <li><a href="#response-adaptive-randomization" id="toc-response-adaptive-randomization" class="nav-link" data-scroll-target="#response-adaptive-randomization">8.3 Response-adaptive randomization</a></li>
+  <li><a href="#operating-characteristics" id="toc-operating-characteristics" class="nav-link" data-scroll-target="#operating-characteristics">8.4 Operating characteristics</a></li>
+  </ul></li>
+  <li><a href="#handling-of-missing-data-and-intercurrent-events" id="toc-handling-of-missing-data-and-intercurrent-events" class="nav-link" data-scroll-target="#handling-of-missing-data-and-intercurrent-events">9. Handling of missing data and intercurrent events</a>
+  <ul class="collapse">
+  <li><a href="#missing-data-on-primary-endpoint" id="toc-missing-data-on-primary-endpoint" class="nav-link" data-scroll-target="#missing-data-on-primary-endpoint">9.1 Missing data on primary endpoint</a></li>
+  <li><a href="#intercurrent-events" id="toc-intercurrent-events" class="nav-link" data-scroll-target="#intercurrent-events">9.2 Intercurrent events</a></li>
+  <li><a href="#definition-of-analysis-cut-off" id="toc-definition-of-analysis-cut-off" class="nav-link" data-scroll-target="#definition-of-analysis-cut-off">9.3 Definition of analysis cut-off</a></li>
+  </ul></li>
+  <li><a href="#sensitivity-analyses" id="toc-sensitivity-analyses" class="nav-link" data-scroll-target="#sensitivity-analyses">10. Sensitivity analyses</a>
+  <ul class="collapse">
+  <li><a href="#stratified-cox-ph" id="toc-stratified-cox-ph" class="nav-link" data-scroll-target="#stratified-cox-ph">10.1 Stratified Cox PH</a></li>
+  <li><a href="#bayesian-weibull-aft" id="toc-bayesian-weibull-aft" class="nav-link" data-scroll-target="#bayesian-weibull-aft">10.2 Bayesian Weibull AFT</a></li>
+  <li><a href="#schoenfeld-diagnostic" id="toc-schoenfeld-diagnostic" class="nav-link" data-scroll-target="#schoenfeld-diagnostic">10.3 Schoenfeld diagnostic</a></li>
+  <li><a href="#alternative-estimand-hypothetical-strategy" id="toc-alternative-estimand-hypothetical-strategy" class="nav-link" data-scroll-target="#alternative-estimand-hypothetical-strategy">10.4 Alternative estimand: hypothetical strategy</a></li>
+  <li><a href="#sensitivity-to-the-futility-threshold" id="toc-sensitivity-to-the-futility-threshold" class="nav-link" data-scroll-target="#sensitivity-to-the-futility-threshold">10.5 Sensitivity to the futility threshold</a></li>
+  </ul></li>
+  <li><a href="#safety-analyses" id="toc-safety-analyses" class="nav-link" data-scroll-target="#safety-analyses">11. Safety analyses</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="sap_section.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Statistical Analysis Plan (Mock Section)</h1>
+<p class="subtitle lead">Phase II Adaptive Oncology Trial — Time-to-Progression Endpoint</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Cris Taylor </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 15, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p><strong>Document status.</strong> This is a mock SAP section developed for portfolio demonstration purposes. Cross-references such as “the protocol” or “Section 8.1” are illustrative rather than literal. Formal CDISC ADaM dataset and TLF specifications would accompany a real SAP.</p>
+</blockquote>
+<section id="study-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="study-objectives">1. Study objectives</h2>
+<section id="primary-objective" class="level3">
+<h3 class="anchored" data-anchor-id="primary-objective">1.1 Primary objective</h3>
+<p>To compare the time from randomization to disease progression or death from any cause (progression-free survival, PFS) between patients receiving the experimental therapy and patients receiving standard-of-care control, in patients with the target indication.</p>
+</section>
+<section id="secondary-objectives" class="level3">
+<h3 class="anchored" data-anchor-id="secondary-objectives">1.2 Secondary objectives</h3>
+<ul>
+<li>Compare overall survival between treatment arms.</li>
+<li>Characterize the safety profile of the experimental therapy.</li>
+<li>Estimate response rate and duration of response.</li>
+</ul>
+</section>
+</section>
+<section id="primary-estimand-ich-e9r1" class="level2">
+<h2 class="anchored" data-anchor-id="primary-estimand-ich-e9r1">2. Primary estimand (ICH E9(R1))</h2>
+<p>The primary estimand is specified through the five attributes of the ICH E9(R1) framework. A treatment-policy strategy is used for the most common intercurrent event (treatment discontinuation), reflecting an intent-to-treat philosophy appropriate for a Phase II exploratory study.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-b6c98242{}.cl-b6c0a866{font-family:'DejaVu Sans';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b6c4bda2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b6c4f59c{width:2.281in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6c4f5a6{width:14.463in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6c4f5a7{width:2.281in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6c4f5b0{width:14.463in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6c4f5b1{width:2.281in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6c4f5b2{width:14.463in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-b6c98242"><thead><tr style="overflow-wrap:break-word;"><th class="cl-b6c4f59c"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Attribute</span></p></th><th class="cl-b6c4f5a6"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Specification</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-b6c4f5a7"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Treatment</span></p></td><td class="cl-b6c4f5b0"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Experimental therapy administered per protocol-defined schedule vs standard-of-care control, both continued until disease progression, unacceptable toxicity, or withdrawal of consent.</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6c4f5a7"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Population</span></p></td><td class="cl-b6c4f5b0"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Patients with the target indication meeting all inclusion criteria and no exclusion criteria as specified in the protocol.</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6c4f5a7"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Endpoint (variable)</span></p></td><td class="cl-b6c4f5b0"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Time from date of randomization to date of first documented disease progression per RECIST 1.1 (assessed by investigator) or death from any cause, whichever occurs first.</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6c4f5a7"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Intercurrent events</span></p></td><td class="cl-b6c4f5b0"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Treatment discontinuation for any reason: treatment-policy strategy (events occurring after discontinuation are included).</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6c4f5b1"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Population-level summary</span></p></td><td class="cl-b6c4f5b2"><p class="cl-b6c4bda2"><span class="cl-b6c0a866">Hazard ratio (experimental vs control) with 95% confidence interval, estimated from a Cox proportional-hazards model.</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="endpoints" class="level2">
+<h2 class="anchored" data-anchor-id="endpoints">3. Endpoints</h2>
+<section id="primary-endpoint" class="level3">
+<h3 class="anchored" data-anchor-id="primary-endpoint">3.1 Primary endpoint</h3>
+<p><strong>Progression-free survival (PFS)</strong>, defined as the time from randomization to the earlier of:</p>
+<ol type="a">
+<li>first documented disease progression (RECIST 1.1, investigator-assessed); or</li>
+<li>death from any cause.</li>
+</ol>
+<p>Patients without an event are censored at the last tumor assessment date prior to data cut-off. The censoring rules follow the FDA 2018 guidance on time-to-event endpoints in oncology.</p>
+</section>
+<section id="key-secondary-endpoints" class="level3">
+<h3 class="anchored" data-anchor-id="key-secondary-endpoints">3.2 Key secondary endpoints</h3>
+<ul>
+<li><strong>Overall survival (OS)</strong> — time from randomization to death from any cause.</li>
+<li><strong>Objective response rate (ORR)</strong> — proportion of patients achieving complete or partial response per RECIST 1.1.</li>
+<li><strong>Duration of response (DoR)</strong> — for responders only, time from first documented response to disease progression or death.</li>
+<li><strong>Time to treatment discontinuation (TTD)</strong> — time from randomization to permanent discontinuation of experimental therapy.</li>
+</ul>
+</section>
+<section id="safety-endpoints" class="level3">
+<h3 class="anchored" data-anchor-id="safety-endpoints">3.3 Safety endpoints</h3>
+<p>Frequency of treatment-emergent adverse events (TEAEs) by MedDRA system organ class and preferred term, graded by CTCAE v5.0, summarized descriptively by treatment arm. Treatment-related TEAEs, serious AEs, and TEAEs leading to discontinuation are summarized separately.</p>
+</section>
+</section>
+<section id="statistical-hypotheses" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-hypotheses">4. Statistical hypotheses</h2>
+<section id="primary-hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="primary-hypothesis">4.1 Primary hypothesis</h3>
+<p>Let <span class="math inline">\(\lambda_E(t)\)</span> and <span class="math inline">\(\lambda_C(t)\)</span> denote the instantaneous hazards of PFS at time <span class="math inline">\(t\)</span> in the experimental and control arms, respectively. The hazard ratio is <span class="math inline">\(HR = \lambda_E(t) / \lambda_C(t)\)</span>, assumed constant under proportional hazards.</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: <span class="math inline">\(HR \geq 1\)</span> (no benefit or harm from experimental therapy)</li>
+<li><span class="math inline">\(H_1\)</span>: <span class="math inline">\(HR &lt; 1\)</span> (experimental therapy reduces hazard of PFS event)</li>
+</ul>
+<p>The hypothesis is tested at a <strong>one-sided significance level of 0.025</strong> using a stratified log-rank test (with the Cox-PH-derived z-statistic compared against the stage 2 O’Brien-Fleming efficacy boundary).</p>
+</section>
+</section>
+<section id="analysis-populations" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-populations">5. Analysis populations</h2>
+<ul>
+<li><strong>Intent-to-treat (ITT)</strong>: all randomized patients, analyzed in the treatment arm to which they were assigned regardless of treatment received. This is the primary analysis population.</li>
+<li><strong>Modified ITT (mITT)</strong>: ITT subset of patients with at least one post-baseline tumor assessment. Used for sensitivity analyses.</li>
+<li><strong>Safety population</strong>: all patients who received at least one dose of study treatment, analyzed by actual treatment received.</li>
+</ul>
+</section>
+<section id="sample-size-justification" class="level2">
+<h2 class="anchored" data-anchor-id="sample-size-justification">6. Sample-size justification</h2>
+<section id="phase-ii-screening-rationale" class="level3">
+<h3 class="anchored" data-anchor-id="phase-ii-screening-rationale">6.1 Phase II screening rationale</h3>
+<p>This is a <strong>Phase II screening trial</strong>, not a confirmatory study. The maximum sample size of <strong>N = 120</strong> (60 per arm) is deliberately small compared to the n ≈ 791 that rpact’s <code>getSampleSizeSurvival</code> returns for an 80%-powered confirmatory trial at HR = 0.70 under this alpha-spending. The trial is sized for a go/no-go efficiency decision under operational constraints (accrual, budget), not to definitively reject moderate effect sizes. A confirmatory Phase III would scale up.</p>
+</section>
+<section id="demonstrated-operating-characteristics" class="level3">
+<h3 class="anchored" data-anchor-id="demonstrated-operating-characteristics">6.2 Demonstrated operating characteristics</h3>
+<p>The selected design achieves the following operating characteristics in the simulation report (<code>report/index.qmd</code>):</p>
+<ul>
+<li><strong>Type I error (one-sided)</strong>: 0.019 (adaptive) / 0.021 (fixed), both below the 0.025 nominal level.</li>
+<li><strong>Power across non-null effects</strong> (adaptive design):
+<ul>
+<li>HR = 0.85: 7.5%</li>
+<li>HR = 0.75: 13.9%</li>
+<li>HR = 0.65: 23.8%</li>
+<li>HR = 0.55: 38.7%</li>
+</ul></li>
+<li><strong>Probability of early futility stop</strong> (adaptive design):
+<ul>
+<li>Harmful (HR = 1.15): 48%</li>
+<li>Null (HR = 1.00): 36%</li>
+<li>Mild benefit (HR = 0.85): 22%</li>
+<li>Very strong benefit (HR = 0.55): 6%</li>
+</ul></li>
+<li><strong>Expected sample-size savings</strong>: 5.4% under the null, 7.7% under the harmful direction.</li>
+</ul>
+<p>The full simulation (12,000 trials across six HR scenarios) is reported in the main simulation report.</p>
+</section>
+</section>
+<section id="primary-analysis-method" class="level2">
+<h2 class="anchored" data-anchor-id="primary-analysis-method">7. Primary analysis method</h2>
+<section id="group-sequential-test" class="level3">
+<h3 class="anchored" data-anchor-id="group-sequential-test">7.1 Group-sequential test</h3>
+<p>The primary analysis is a Cox proportional-hazards model with treatment arm as the sole covariate, fit at the planned final analysis (after follow-up completion at month 24 or after all patients have been on study for at least 12 months, whichever is later). The treatment effect is summarized as the hazard ratio (experimental vs control) with 95% confidence interval.</p>
+<p>The decision rule applies the O’Brien-Fleming group-sequential boundary from a 2-stage design with one interim look at 30% information time under the design alternative HR = 0.70, at one-sided <span class="math inline">\(\alpha = 0.025\)</span>:</p>
+<ul>
+<li><strong>Stage 1 (interim)</strong>: trial may stop for futility (see Section 8) but not for efficacy. No efficacy z-boundary is applied at interim.</li>
+<li><strong>Stage 2 (final)</strong>: <span class="math inline">\(z\)</span>-boundary = 1.969. Reject <span class="math inline">\(H_0\)</span> if the final Cox-derived z-statistic (<span class="math inline">\(z = -\hat{\beta} / \mathrm{se}(\hat{\beta})\)</span>, where <span class="math inline">\(\hat{\beta}\)</span> is the log-HR estimate) exceeds the stage 2 boundary AND the HR point estimate is below 1.</li>
+</ul>
+<p>The Cox PH proportional hazards assumption is assessed via Schoenfeld residual tests (Section 10).</p>
+</section>
+</section>
+<section id="adaptive-design-procedures" class="level2">
+<h2 class="anchored" data-anchor-id="adaptive-design-procedures">8. Adaptive design procedures</h2>
+<section id="interim-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="interim-analysis">8.1 Interim analysis</h3>
+<p>A single interim analysis is conducted when <strong>12 observed events</strong> have accumulated — approximately 30% of the expected total events under the design alternative (HR = 0.70). The interim therefore fires on the basis of statistical information, not enrollment progress. The interim analysis is performed by an independent statistician unblinded to treatment assignment, with results reviewed by an Independent Data Monitoring Committee (IDMC).</p>
+</section>
+<section id="futility-stopping-rule" class="level3">
+<h3 class="anchored" data-anchor-id="futility-stopping-rule">8.2 Futility stopping rule</h3>
+<p>At the interim, a Bayesian exponential survival model is fit to the observed data:</p>
+<p><span class="math display">\[
+T_i \mid \text{arm}_i, \lambda_C, HR \sim
+\text{Exponential}(\lambda_C \cdot HR^{1\{\text{arm}_i = E\}}),
+\]</span></p>
+<p>with weakly informative priors <span class="math inline">\(\lambda_C \sim \text{Gamma}(2, 80)\)</span> (centered at the assumed baseline hazard of 0.025/month) and <span class="math inline">\(\log HR \sim \mathcal{N}(0, 1)\)</span>.</p>
+<p>The trial <strong>stops for futility</strong> if the interim posterior probability of clinically meaningful benefit is below threshold:</p>
+<p><span class="math display">\[
+\Pr(HR &lt; 0.70 \mid \text{interim data}) &lt; 0.20.
+\]</span></p>
+<p>A futility stop results in <span class="math inline">\(H_0\)</span> being accepted; no statistical adjustment is applied to the type I error because futility stopping is binding.</p>
+</section>
+<section id="response-adaptive-randomization" class="level3">
+<h3 class="anchored" data-anchor-id="response-adaptive-randomization">8.3 Response-adaptive randomization</h3>
+<p>If the trial continues past interim, the allocation ratio is updated from 1:1 to a Thompson-style scheme:</p>
+<p><span class="math display">\[
+\alpha_E = \max\left(0.20,\, \min\left(0.80,\, \sqrt{\Pr(HR &lt; 1 \mid \text{data})}\right)\right),
+\]</span></p>
+<p>where <span class="math inline">\(\alpha_E\)</span> is the probability of assigning the next patient to the experimental arm. The 20%–80% caps prevent extreme imbalance that would inflate variance and complicate the final analysis.</p>
+<p>Allocation is re-evaluated every 20 enrollees by refitting the Bayesian model on accrued data. The interim posterior and each refit posterior are documented in trial records for regulatory traceability.</p>
+</section>
+<section id="operating-characteristics" class="level3">
+<h3 class="anchored" data-anchor-id="operating-characteristics">8.4 Operating characteristics</h3>
+<p>Full operating characteristics across six HR scenarios (1.15, 1.00, 0.85, 0.75, 0.65, 0.55) are reported in <code>report/index.qmd</code> §5 and Figures 5.1–5.4. Type I error is controlled at 0.019 under the null hypothesis (adaptive design) / 0.021 (fixed design), verified by 10,000 simulated trials per scenario (MCSE on Type I &lt; 0.002).</p>
+</section>
+</section>
+<section id="handling-of-missing-data-and-intercurrent-events" class="level2">
+<h2 class="anchored" data-anchor-id="handling-of-missing-data-and-intercurrent-events">9. Handling of missing data and intercurrent events</h2>
+<section id="missing-data-on-primary-endpoint" class="level3">
+<h3 class="anchored" data-anchor-id="missing-data-on-primary-endpoint">9.1 Missing data on primary endpoint</h3>
+<p>The primary endpoint (PFS) is fully observed (either as an event or as a censoring time) by design. No imputation is performed for tumor assessments missed within tolerance windows; censoring uses last documented evaluable assessment.</p>
+</section>
+<section id="intercurrent-events" class="level3">
+<h3 class="anchored" data-anchor-id="intercurrent-events">9.2 Intercurrent events</h3>
+<p>Per the primary estimand (Section 2):</p>
+<ul>
+<li><strong>Treatment discontinuation</strong>: treatment-policy strategy. Events occurring after discontinuation are included in the analysis.</li>
+<li><strong>Switching to alternative therapy</strong>: treatment-policy strategy; data collection continues per protocol.</li>
+<li><strong>Death</strong>: a component of the primary endpoint (composite endpoint treatment).</li>
+</ul>
+</section>
+<section id="definition-of-analysis-cut-off" class="level3">
+<h3 class="anchored" data-anchor-id="definition-of-analysis-cut-off">9.3 Definition of analysis cut-off</h3>
+<p>The data cut-off for the primary analysis is the date 24 months after the first patient is randomized (or 12 months after the last patient is randomized, whichever is later). Patients without an event at cut-off are censored at their last tumor assessment date.</p>
+</section>
+</section>
+<section id="sensitivity-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity-analyses">10. Sensitivity analyses</h2>
+<section id="stratified-cox-ph" class="level3">
+<h3 class="anchored" data-anchor-id="stratified-cox-ph">10.1 Stratified Cox PH</h3>
+<p>A stratified Cox model stratifying on baseline factors with potential PH violation (e.g., prior systemic therapy line, performance status) is fit as a sensitivity analysis. Results are reported alongside the primary unstratified analysis.</p>
+</section>
+<section id="bayesian-weibull-aft" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-weibull-aft">10.2 Bayesian Weibull AFT</h3>
+<p>A parametric Weibull accelerated-failure-time model is fit to the same data as a parametric sensitivity analysis. Posterior medians and 95% credible intervals on the hazard ratio (computed as the inverse of the posterior time ratio) are reported. Agreement with the Cox PH estimate provides reassurance that the proportional-hazards assumption is not materially violated. This dual reporting is illustrated for TCGA-BRCA in <code>report/index.qmd</code> Section 6.3.</p>
+</section>
+<section id="schoenfeld-diagnostic" class="level3">
+<h3 class="anchored" data-anchor-id="schoenfeld-diagnostic">10.3 Schoenfeld diagnostic</h3>
+<p>The proportional-hazards assumption is formally tested via <code>survival::cox.zph()</code> using scaled Schoenfeld residuals. Any covariate with <span class="math inline">\(p &lt; 0.05\)</span> is investigated graphically, and a stratified Cox model is fit as the sensitivity analysis if the global test is violated.</p>
+</section>
+<section id="alternative-estimand-hypothetical-strategy" class="level3">
+<h3 class="anchored" data-anchor-id="alternative-estimand-hypothetical-strategy">10.4 Alternative estimand: hypothetical strategy</h3>
+<p>A secondary analysis under the “hypothetical strategy” (assuming treatment discontinuation did not occur) is performed by censoring patients at the time of discontinuation. This analysis supplements but does not replace the primary treatment-policy analysis.</p>
+</section>
+<section id="sensitivity-to-the-futility-threshold" class="level3">
+<h3 class="anchored" data-anchor-id="sensitivity-to-the-futility-threshold">10.5 Sensitivity to the futility threshold</h3>
+<p>The futility rule’s threshold <span class="math inline">\(\theta\)</span> (<code>P(HR &lt; 0.7 \mid data) &lt; \theta</code> → stop) is an operator-defined parameter. We assessed sensitivity by sweeping <span class="math inline">\(\theta \in \{0.10, 0.15, 0.20, 0.30\}\)</span> across all six HR scenarios with 300 simulated trials per cell (<code>R/11_futility_sensitivity.R</code>, 7,200 sims total, ~90 s wall time). Full results in <code>outputs/tables/futility_sensitivity.csv</code>; key findings:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-b6fa7c8a{}.cl-b6f1e0a2{font-family:'DejaVu Sans';font-size:8pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-b6f53766{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-b6f567cc{width:1.705in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567d6{width:0.902in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567d7{width:0.625in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567e0{width:0.996in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567e1{width:1.048in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567e2{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567e3{width:1.705in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567ea{width:0.902in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567eb{width:0.625in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567ec{width:0.996in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567ed{width:1.048in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567f4{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567f5{width:1.705in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567fe{width:0.902in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f567ff{width:0.625in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56800{width:0.996in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56801{width:1.048in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56802{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56808{width:1.705in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56809{width:0.902in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56812{width:0.625in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f56813{width:0.996in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f5681c{width:1.048in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b6f5681d{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-b6fa7c8a"><thead><tr style="overflow-wrap:break-word;"><th class="cl-b6f567cc"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">Scenario</span></p></th><th class="cl-b6f567d6"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">True HR</span></p></th><th class="cl-b6f567d7"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">θ</span></p></th><th class="cl-b6f567e0"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">Pr(reject)</span></p></th><th class="cl-b6f567e1"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">Pr(futility)</span></p></th><th class="cl-b6f567e2"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">E[N]</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">harmful</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.15</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.010</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.310</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">114.3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">harmful</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.15</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.007</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.397</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">112.6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">harmful</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.15</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.007</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.457</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">111.3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">harmful</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.15</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.007</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.570</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">109.4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">null</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.00</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.017</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.213</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">116.4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">null</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.00</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.013</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.283</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">115.5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">null</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.00</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.013</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.323</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">114.6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567e3"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">null</span></p></td><td class="cl-b6f567ea"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">1.00</span></p></td><td class="cl-b6f567eb"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f567ec"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.017</span></p></td><td class="cl-b6f567ed"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.447</span></p></td><td class="cl-b6f567f4"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">112.8</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">mild_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.85</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.053</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.113</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">mild_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.85</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.050</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.157</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">117.6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">mild_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.85</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.047</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.197</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">116.9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">mild_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.85</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.050</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.280</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">115.7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">moderate_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.75</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.100</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.080</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.9</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">moderate_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.75</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.100</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.120</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">moderate_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.75</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.097</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.137</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.0</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">moderate_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.75</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.100</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.193</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">117.2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.65</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.227</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.023</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">119.7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.65</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.223</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.047</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">119.1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.65</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.220</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.070</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.8</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.65</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.213</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.123</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">very_strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.55</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.10</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.400</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.007</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">119.8</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">very_strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.55</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.15</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.400</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.020</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">119.6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f567f5"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">very_strong_effect</span></p></td><td class="cl-b6f567fe"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.55</span></p></td><td class="cl-b6f567ff"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.20</span></p></td><td class="cl-b6f56800"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.400</span></p></td><td class="cl-b6f56801"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.033</span></p></td><td class="cl-b6f56802"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">119.4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b6f56808"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">very_strong_effect</span></p></td><td class="cl-b6f56809"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.55</span></p></td><td class="cl-b6f56812"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.30</span></p></td><td class="cl-b6f56813"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.393</span></p></td><td class="cl-b6f5681c"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">0.077</span></p></td><td class="cl-b6f5681d"><p class="cl-b6f53766"><span class="cl-b6f1e0a2">118.9</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../home/runner/work/bayesian-adaptive-trial-sim/bayesian-adaptive-trial-sim/outputs/figures/futility_sensitivity.png" class="img-fluid figure-img"></p>
+<figcaption>Futility-stop probability and rejection rate vs the futility threshold <span class="math inline">\(\theta\)</span>, by scenario. Top panel: stopping is highly responsive to <span class="math inline">\(\theta\)</span> under null/harmful scenarios; bottom panel: rejection rate is essentially invariant to <span class="math inline">\(\theta\)</span>.</figcaption>
+</figure>
+</div>
+<p><strong>Key findings.</strong></p>
+<ul>
+<li><strong>Type I error is robust to the threshold.</strong> Under the null, rejection rate is 0.013–0.017 across the sweep — well below the 0.025 nominal at every threshold. Futility-only stopping is binding (cannot reject H<sub>0</sub>), so increasing <span class="math inline">\(\theta\)</span> cannot inflate Type I.</li>
+<li><strong>Power is essentially invariant to the threshold.</strong> At very-strong benefit (HR = 0.55), reject rate is 39.3%–40.0% across <span class="math inline">\(\theta\)</span>; at strong (HR = 0.65), 21.3%–22.7%. The differences are within MC noise for 300 sims (MC SE ~0.028).</li>
+<li><strong>Pr(futility stop) scales linearly with <span class="math inline">\(\theta\)</span></strong> under null and harmful (21% → 45% under null; 31% → 57% under harmful as <span class="math inline">\(\theta\)</span> goes 0.10 → 0.30) and modestly under benefit (very-strong: 0.7% → 7.7%).</li>
+<li><strong>E[N] decreases with <span class="math inline">\(\theta\)</span></strong> as more futility stops shorten trials. Under harmful: 114 → 109. Modest absolute savings, but cumulative ethical benefit across many trials in a program.</li>
+</ul>
+<p><strong>Selected threshold (<span class="math inline">\(\theta = 0.20\)</span>) is defensible.</strong> The choice sits near the middle of the sweep and achieves a 48% futility-stop probability under harmful (vs 57% at <span class="math inline">\(\theta = 0.30\)</span>) without any detectable power cost vs the more conservative <span class="math inline">\(\theta = 0.10\)</span>. A more aggressive value (0.30) is plausible if maximum patient-sparing under no benefit is prioritized over a small probability of stopping under true (mild) benefit.</p>
+</section>
+</section>
+<section id="safety-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="safety-analyses">11. Safety analyses</h2>
+<p>Treatment-emergent AEs (TEAEs), defined as AEs with onset on or after the first dose of study treatment, are summarized by:</p>
+<ul>
+<li>System organ class and preferred term per MedDRA (current version at database lock).</li>
+<li>Maximum severity (CTCAE v5.0).</li>
+<li>Treatment arm.</li>
+</ul>
+<p>Safety analysis is descriptive only; no formal hypothesis tests are performed. Key safety outputs include:</p>
+<ul>
+<li>Overall TEAE summary (any grade, grade ≥ 3, serious, fatal, treatment-related).</li>
+<li>TEAE table by SOC and PT, sorted by frequency.</li>
+<li>AE leading to discontinuation table.</li>
+<li>Laboratory shift tables (baseline to worst on-treatment grade).</li>
+</ul>
+<p>A Safety Review Committee reviews aggregated safety data at the interim analysis in parallel with the IDMC futility review.</p>
+<hr>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><strong>ICH E9(R1)</strong> — <em>Statistical Principles for Clinical Trials, Addendum on Estimands and Sensitivity Analyses in Clinical Trials</em>, 2019.</li>
+<li><strong>FDA</strong> — <em>Adaptive Designs for Clinical Trials of Drugs and Biologics</em>, Guidance for Industry, November 2019.</li>
+<li><strong>FDA</strong> — <em>Clinical Trial Endpoints for the Approval of Cancer Drugs and Biologics</em>, Guidance for Industry, December 2018.</li>
+<li><strong>RECIST 1.1</strong> — Eisenhauer EA et al.&nbsp;New response evaluation criteria in solid tumours: revised RECIST guideline (version 1.1). <em>Eur J Cancer</em> 2009; 45: 228–247.</li>
+<li><strong>CTCAE v5.0</strong> — Common Terminology Criteria for Adverse Events, National Cancer Institute, 2017.</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,392 @@
+---
+title: "Statistical Analysis Plan (Mock Section)"
+subtitle: "Phase II Adaptive Oncology Trial — Time-to-Progression Endpoint"
+author: "Cris Taylor"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+  pdf:
+    toc: true
+    geometry: margin=1in
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+> **Document status.** This is a mock SAP section developed for portfolio
+> demonstration purposes. Cross-references such as "the protocol" or
+> "Section 8.1" are illustrative rather than literal. Formal CDISC ADaM
+> dataset and TLF specifications would accompany a real SAP.
+
+## 1. Study objectives
+
+### 1.1 Primary objective
+
+To compare the time from randomization to disease progression or death
+from any cause (progression-free survival, PFS) between patients
+receiving the experimental therapy and patients receiving standard-of-care
+control, in patients with the target indication.
+
+### 1.2 Secondary objectives
+
+- Compare overall survival between treatment arms.
+- Characterize the safety profile of the experimental therapy.
+- Estimate response rate and duration of response.
+
+## 2. Primary estimand (ICH E9(R1))
+
+The primary estimand is specified through the five attributes of the
+ICH E9(R1) framework. A treatment-policy strategy is used for the most
+common intercurrent event (treatment discontinuation), reflecting an
+intent-to-treat philosophy appropriate for a Phase II exploratory study.
+
+```{r estimand-sap}
+suppressPackageStartupMessages({ library(flextable); library(tibble) })
+tibble::tribble(
+  ~Attribute,                  ~Specification,
+  "Treatment",                 "Experimental therapy administered per protocol-defined schedule vs standard-of-care control, both continued until disease progression, unacceptable toxicity, or withdrawal of consent.",
+  "Population",                "Patients with the target indication meeting all inclusion criteria and no exclusion criteria as specified in the protocol.",
+  "Endpoint (variable)",       "Time from date of randomization to date of first documented disease progression per RECIST 1.1 (assessed by investigator) or death from any cause, whichever occurs first.",
+  "Intercurrent events",       "Treatment discontinuation for any reason: treatment-policy strategy (events occurring after discontinuation are included).",
+  "Population-level summary",  "Hazard ratio (experimental vs control) with 95% confidence interval, estimated from a Cox proportional-hazards model."
+) |>
+  flextable() |> theme_booktabs() |> autofit() |> fontsize(size = 10, part = "all")
+```
+
+## 3. Endpoints
+
+### 3.1 Primary endpoint
+
+**Progression-free survival (PFS)**, defined as the time from randomization
+to the earlier of:
+
+(a) first documented disease progression (RECIST 1.1, investigator-assessed); or
+(b) death from any cause.
+
+Patients without an event are censored at the last tumor assessment date
+prior to data cut-off. The censoring rules follow the FDA 2018 guidance
+on time-to-event endpoints in oncology.
+
+### 3.2 Key secondary endpoints
+
+- **Overall survival (OS)** — time from randomization to death from any cause.
+- **Objective response rate (ORR)** — proportion of patients achieving
+  complete or partial response per RECIST 1.1.
+- **Duration of response (DoR)** — for responders only, time from first
+  documented response to disease progression or death.
+- **Time to treatment discontinuation (TTD)** — time from randomization
+  to permanent discontinuation of experimental therapy.
+
+### 3.3 Safety endpoints
+
+Frequency of treatment-emergent adverse events (TEAEs) by MedDRA system
+organ class and preferred term, graded by CTCAE v5.0, summarized
+descriptively by treatment arm. Treatment-related TEAEs, serious AEs, and
+TEAEs leading to discontinuation are summarized separately.
+
+## 4. Statistical hypotheses
+
+### 4.1 Primary hypothesis
+
+Let $\lambda_E(t)$ and $\lambda_C(t)$ denote the instantaneous hazards of
+PFS at time $t$ in the experimental and control arms, respectively. The
+hazard ratio is $HR = \lambda_E(t) / \lambda_C(t)$, assumed constant under
+proportional hazards.
+
+- $H_0$: $HR \geq 1$ (no benefit or harm from experimental therapy)
+- $H_1$: $HR < 1$ (experimental therapy reduces hazard of PFS event)
+
+The hypothesis is tested at a **one-sided significance level of 0.025** using
+a stratified log-rank test (with the Cox-PH-derived z-statistic compared
+against the stage 2 O'Brien-Fleming efficacy boundary).
+
+## 5. Analysis populations
+
+- **Intent-to-treat (ITT)**: all randomized patients, analyzed in the
+  treatment arm to which they were assigned regardless of treatment
+  received. This is the primary analysis population.
+- **Modified ITT (mITT)**: ITT subset of patients with at least one
+  post-baseline tumor assessment. Used for sensitivity analyses.
+- **Safety population**: all patients who received at least one dose of
+  study treatment, analyzed by actual treatment received.
+
+## 6. Sample-size justification
+
+### 6.1 Phase II screening rationale
+
+This is a **Phase II screening trial**, not a confirmatory study. The
+maximum sample size of **N = 120** (60 per arm) is deliberately small
+compared to the n ≈ 791 that rpact's `getSampleSizeSurvival` returns
+for an 80%-powered confirmatory trial at HR = 0.70 under this
+alpha-spending. The trial is sized for a go/no-go efficiency decision
+under operational constraints (accrual, budget), not to definitively
+reject moderate effect sizes. A confirmatory Phase III would scale up.
+
+### 6.2 Demonstrated operating characteristics
+
+The selected design achieves the following operating characteristics
+in the simulation report (`report/index.qmd`):
+
+- **Type I error (one-sided)**: 0.019 (adaptive) / 0.021 (fixed), both
+  below the 0.025 nominal level.
+- **Power across non-null effects** (adaptive design):
+  - HR = 0.85: 7.5%
+  - HR = 0.75: 13.9%
+  - HR = 0.65: 23.8%
+  - HR = 0.55: 38.7%
+- **Probability of early futility stop** (adaptive design):
+  - Harmful (HR = 1.15): 48%
+  - Null (HR = 1.00): 36%
+  - Mild benefit (HR = 0.85): 22%
+  - Very strong benefit (HR = 0.55): 6%
+- **Expected sample-size savings**: 5.4% under the null, 7.7% under the
+  harmful direction.
+
+The full simulation (12,000 trials across six HR scenarios) is reported
+in the main simulation report.
+
+## 7. Primary analysis method
+
+### 7.1 Group-sequential test
+
+The primary analysis is a Cox proportional-hazards model with treatment arm
+as the sole covariate, fit at the planned final analysis (after follow-up
+completion at month 24 or after all patients have been on study for at
+least 12 months, whichever is later). The treatment effect is summarized
+as the hazard ratio (experimental vs control) with 95% confidence interval.
+
+The decision rule applies the O'Brien-Fleming group-sequential boundary
+from a 2-stage design with one interim look at 30% information time
+under the design alternative HR = 0.70, at one-sided $\alpha = 0.025$:
+
+- **Stage 1 (interim)**: trial may stop for futility (see Section 8) but
+  not for efficacy. No efficacy z-boundary is applied at interim.
+- **Stage 2 (final)**: $z$-boundary = 1.969. Reject $H_0$ if the final
+  Cox-derived z-statistic ($z = -\hat{\beta} / \mathrm{se}(\hat{\beta})$,
+  where $\hat{\beta}$ is the log-HR estimate) exceeds the stage 2
+  boundary AND the HR point estimate is below 1.
+
+The Cox PH proportional hazards assumption is assessed via Schoenfeld
+residual tests (Section 10).
+
+## 8. Adaptive design procedures
+
+### 8.1 Interim analysis
+
+A single interim analysis is conducted when **12 observed events** have
+accumulated — approximately 30% of the expected total events under the
+design alternative (HR = 0.70). The interim therefore fires on the
+basis of statistical information, not enrollment progress. The interim
+analysis is performed by an independent statistician unblinded to
+treatment assignment, with results reviewed by an Independent Data
+Monitoring Committee (IDMC).
+
+### 8.2 Futility stopping rule
+
+At the interim, a Bayesian exponential survival model is fit to the
+observed data:
+
+$$
+T_i \mid \text{arm}_i, \lambda_C, HR \sim
+\text{Exponential}(\lambda_C \cdot HR^{1\{\text{arm}_i = E\}}),
+$$
+
+with weakly informative priors $\lambda_C \sim \text{Gamma}(2, 80)$
+(centered at the assumed baseline hazard of 0.025/month) and
+$\log HR \sim \mathcal{N}(0, 1)$.
+
+The trial **stops for futility** if the interim posterior probability of
+clinically meaningful benefit is below threshold:
+
+$$
+\Pr(HR < 0.70 \mid \text{interim data}) < 0.20.
+$$
+
+A futility stop results in $H_0$ being accepted; no statistical
+adjustment is applied to the type I error because futility stopping is
+binding.
+
+### 8.3 Response-adaptive randomization
+
+If the trial continues past interim, the allocation ratio is updated
+from 1:1 to a Thompson-style scheme:
+
+$$
+\alpha_E = \max\left(0.20,\, \min\left(0.80,\, \sqrt{\Pr(HR < 1 \mid \text{data})}\right)\right),
+$$
+
+where $\alpha_E$ is the probability of assigning the next patient to the
+experimental arm. The 20%–80% caps prevent extreme imbalance that would
+inflate variance and complicate the final analysis.
+
+Allocation is re-evaluated every 20 enrollees by refitting the Bayesian
+model on accrued data. The interim posterior and each refit posterior
+are documented in trial records for regulatory traceability.
+
+### 8.4 Operating characteristics
+
+Full operating characteristics across six HR scenarios (1.15, 1.00, 0.85,
+0.75, 0.65, 0.55) are reported in `report/index.qmd` §5 and Figures
+5.1–5.4. Type I error is controlled at 0.019 under the null hypothesis
+(adaptive design) / 0.021 (fixed design), verified by 10,000 simulated
+trials per scenario (MCSE on Type I < 0.002).
+
+## 9. Handling of missing data and intercurrent events
+
+### 9.1 Missing data on primary endpoint
+
+The primary endpoint (PFS) is fully observed (either as an event or as a
+censoring time) by design. No imputation is performed for tumor
+assessments missed within tolerance windows; censoring uses last
+documented evaluable assessment.
+
+### 9.2 Intercurrent events
+
+Per the primary estimand (Section 2):
+
+- **Treatment discontinuation**: treatment-policy strategy. Events
+  occurring after discontinuation are included in the analysis.
+- **Switching to alternative therapy**: treatment-policy strategy; data
+  collection continues per protocol.
+- **Death**: a component of the primary endpoint (composite endpoint
+  treatment).
+
+### 9.3 Definition of analysis cut-off
+
+The data cut-off for the primary analysis is the date 24 months after the
+first patient is randomized (or 12 months after the last patient is
+randomized, whichever is later). Patients without an event at cut-off
+are censored at their last tumor assessment date.
+
+## 10. Sensitivity analyses
+
+### 10.1 Stratified Cox PH
+
+A stratified Cox model stratifying on baseline factors with potential PH
+violation (e.g., prior systemic therapy line, performance status) is fit
+as a sensitivity analysis. Results are reported alongside the primary
+unstratified analysis.
+
+### 10.2 Bayesian Weibull AFT
+
+A parametric Weibull accelerated-failure-time model is fit to the same
+data as a parametric sensitivity analysis. Posterior medians and 95%
+credible intervals on the hazard ratio (computed as the inverse of the
+posterior time ratio) are reported. Agreement with the Cox PH estimate
+provides reassurance that the proportional-hazards assumption is not
+materially violated. This dual reporting is illustrated for TCGA-BRCA
+in `report/index.qmd` Section 6.3.
+
+### 10.3 Schoenfeld diagnostic
+
+The proportional-hazards assumption is formally tested via
+`survival::cox.zph()` using scaled Schoenfeld residuals. Any covariate
+with $p < 0.05$ is investigated graphically, and a stratified Cox model
+is fit as the sensitivity analysis if the global test is violated.
+
+### 10.4 Alternative estimand: hypothetical strategy
+
+A secondary analysis under the "hypothetical strategy" (assuming
+treatment discontinuation did not occur) is performed by censoring
+patients at the time of discontinuation. This analysis supplements but
+does not replace the primary treatment-policy analysis.
+
+### 10.5 Sensitivity to the futility threshold
+
+The futility rule's threshold $\theta$ (`P(HR < 0.7 \mid data) < \theta`
+→ stop) is an operator-defined parameter. We assessed sensitivity by
+sweeping $\theta \in \{0.10, 0.15, 0.20, 0.30\}$ across all six HR
+scenarios with 300 simulated trials per cell (`R/11_futility_sensitivity.R`,
+7,200 sims total, ~90 s wall time). Full results in
+`outputs/tables/futility_sensitivity.csv`; key findings:
+
+```{r futility-sens-table}
+sens <- read.csv(here::here("outputs", "tables", "futility_sensitivity.csv"))
+sens |>
+  dplyr::transmute(
+    Scenario           = scenario,
+    `True HR`          = sprintf("%.2f", hr_true),
+    `θ`                = sprintf("%.2f", futility_threshold),
+    `Pr(reject)`       = sprintf("%.3f", reject_rate),
+    `Pr(futility)`     = sprintf("%.3f", p_futility_stop),
+    `E[N]`             = sprintf("%.1f", e_n)
+  ) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit() |>
+  flextable::fontsize(size = 8, part = "all")
+```
+
+![Futility-stop probability and rejection rate vs the futility
+threshold $\theta$, by scenario. Top panel: stopping is highly
+responsive to $\theta$ under null/harmful scenarios; bottom panel:
+rejection rate is essentially invariant to
+$\theta$.](`r here::here('outputs','figures','futility_sensitivity.png')`)
+
+**Key findings.**
+
+- **Type I error is robust to the threshold.** Under the null,
+  rejection rate is 0.013–0.017 across the sweep — well below the
+  0.025 nominal at every threshold. Futility-only stopping is binding
+  (cannot reject H~0~), so increasing $\theta$ cannot inflate Type I.
+- **Power is essentially invariant to the threshold.** At very-strong
+  benefit (HR = 0.55), reject rate is 39.3%–40.0% across $\theta$;
+  at strong (HR = 0.65), 21.3%–22.7%. The differences are within MC
+  noise for 300 sims (MC SE ~0.028).
+- **Pr(futility stop) scales linearly with $\theta$** under null and
+  harmful (21% → 45% under null; 31% → 57% under harmful as $\theta$
+  goes 0.10 → 0.30) and modestly under benefit (very-strong: 0.7% →
+  7.7%).
+- **E[N] decreases with $\theta$** as more futility stops shorten
+  trials. Under harmful: 114 → 109. Modest absolute savings, but
+  cumulative ethical benefit across many trials in a program.
+
+**Selected threshold ($\theta = 0.20$) is defensible.** The choice sits
+near the middle of the sweep and achieves a 48% futility-stop
+probability under harmful (vs 57% at $\theta = 0.30$) without any
+detectable power cost vs the more conservative $\theta = 0.10$. A more
+aggressive value (0.30) is plausible if maximum patient-sparing under
+no benefit is prioritized over a small probability of stopping under
+true (mild) benefit.
+
+## 11. Safety analyses
+
+Treatment-emergent AEs (TEAEs), defined as AEs with onset on or after the
+first dose of study treatment, are summarized by:
+
+- System organ class and preferred term per MedDRA (current version at
+  database lock).
+- Maximum severity (CTCAE v5.0).
+- Treatment arm.
+
+Safety analysis is descriptive only; no formal hypothesis tests are
+performed. Key safety outputs include:
+
+- Overall TEAE summary (any grade, grade ≥ 3, serious, fatal,
+  treatment-related).
+- TEAE table by SOC and PT, sorted by frequency.
+- AE leading to discontinuation table.
+- Laboratory shift tables (baseline to worst on-treatment grade).
+
+A Safety Review Committee reviews aggregated safety data at the interim
+analysis in parallel with the IDMC futility review.
+
+---
+
+## References
+
+- **ICH E9(R1)** — *Statistical Principles for Clinical Trials, Addendum
+  on Estimands and Sensitivity Analyses in Clinical Trials*, 2019.
+- **FDA** — *Adaptive Designs for Clinical Trials of Drugs and Biologics*,
+  Guidance for Industry, November 2019.
+- **FDA** — *Clinical Trial Endpoints for the Approval of Cancer Drugs and
+  Biologics*, Guidance for Industry, December 2018.
+- **RECIST 1.1** — Eisenhauer EA et al. New response evaluation criteria
+  in solid tumours: revised RECIST guideline (version 1.1).
+  *Eur J Cancer* 2009; 45: 228–247.
+- **CTCAE v5.0** — Common Terminology Criteria for Adverse Events,
+  National Cancer Institute, 2017.
