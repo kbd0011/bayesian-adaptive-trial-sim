@@ -125,11 +125,6 @@ Both models agree **directionally**: HR+ is significantly protective and each de
 - **Adaptive HR estimates are biased upward** (mean log-HR bias +0.03 to +0.09, decreasing with stronger true effect) due to two mechanisms: (1) futility-stopped trials report the interim Bayesian posterior median, which is pulled toward HR = 1 by the weakly informative prior; (2) RAR-induced allocation imbalance modestly inflates the Cox HR estimate under benefit. The fixed design's bias is the standard small-sample Cox attenuation (-0.01 to -0.03), opposite direction. Quantified in `report/index.qmd` §7 (bias table by scenario × design); see `outputs/tables/oc_table.csv` `bias_log_hr` column. The Cox PH analysis does not adjust for RAR-induced imbalance — an IPTW-weighted sensitivity would be the standard regulatory companion.
 - **TCGA-BRCA is a survival toolkit validation, not a data-generating-model validation.** The endpoint (overall survival in breast cancer) differs from the simulator's (time-to-progression in a hypothetical oncology indication). The TCGA section demonstrates that the same Stan / KM / Cox / AFT pipeline works on real, messier data — not that the simulator's exponential data-generating model matches breast cancer biology.
 
-## Resume bullets
-
-> **Bayesian Adaptive Phase II Oncology Trial Simulator (R `{rstan}`, `{rpact}`, SAS PROC SEQDESIGN)** — Designed response-adaptive randomization with event-driven interim futility across 6 prior scenarios (1,000 sims each, 12,000 total); demonstrated 36–48% probability of early futility stop under null/harmful effects (5–8% E[N] savings) while controlling Type I error at 0.019 vs 0.025 target; cross-validated group-sequential boundaries between `{rpact}` and `PROC SEQDESIGN`.
-
-> **Survival analysis on TCGA-BRCA (n = 1,098)** — Built Kaplan-Meier, Cox PH with Schoenfeld diagnostic, and Bayesian Weibull AFT (Stan, 4 chains, R̂ < 1.01); Cox flagged PH violation for hormone-receptor status, which the parametric AFT then bounded with a coherent posterior; documented per ICH E9(R1) estimand framework in a mock SAP section.
 
 ## Background
 
