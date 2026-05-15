@@ -5,9 +5,12 @@
 #           (scenario, design) pair.
 # Inputs  : config.yml + outputs/sims/design_params.rds
 # Outputs : outputs/sims/raw_<scenario>_<design>.rds (one per pair, 12 total)
-# CLI     : --n-sims N    override CONFIG$simulation$n_sims_full
-#           --workers N   override CONFIG$simulation$parallel_workers
+# CLI     : --n-sims N       override CONFIG$simulation$n_sims_full
+#           --workers N      override CONFIG$simulation$parallel_workers
+#           --shard-id K     1-based shard index for matrix sharding
+#           --total-shards N total number of shards (default 1 = no sharding)
 # Usage   : Rscript R/04_run_all_sims.R --n-sims 100
+#           Rscript R/04_run_all_sims.R --n-sims 10000 --shard-id 3 --total-shards 10
 # Author  : Cris Taylor
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
@@ -21,11 +24,18 @@ source(here::here("R/03_sim_adaptive.R"))
   i <- which(args == key)
   if (length(i) == 1L && i < length(args)) as(args[i + 1L]) else default
 }
-cli_args <- commandArgs(trailingOnly = TRUE)
-n_sims   <- .parse_arg(cli_args, "--n-sims",
-                       default = CONFIG$simulation$n_sims_full)
-n_workers <- .parse_arg(cli_args, "--workers",
-                        default = CONFIG$simulation$parallel_workers)
+cli_args     <- commandArgs(trailingOnly = TRUE)
+n_sims       <- .parse_arg(cli_args, "--n-sims",
+                           default = CONFIG$simulation$n_sims_full)
+n_workers    <- .parse_arg(cli_args, "--workers",
+                           default = CONFIG$simulation$parallel_workers)
+shard_id     <- .parse_arg(cli_args, "--shard-id",     default = 1L)
+total_shards <- .parse_arg(cli_args, "--total-shards", default = 1L)
+stopifnot(
+  "shard-id must be >= 1"        = shard_id >= 1L,
+  "shard-id must be <= total-shards" = shard_id <= total_shards,
+  "total-shards must be >= 1"    = total_shards >= 1L
+)
 
 # Reconfigure future plan if user overrode workers
 if (n_workers != CONFIG$simulation$parallel_workers) {
@@ -35,6 +45,7 @@ if (n_workers != CONFIG$simulation$parallel_workers) {
 cli::cli_h1("Run all sims")
 cli::cli_alert_info("n_sims per (scenario, design) = {n_sims}")
 cli::cli_alert_info("parallel workers              = {n_workers}")
+cli::cli_alert_info("shard                         = {shard_id} / {total_shards}")
 
 # --- load rpact design parameters -------------------------------------------
 design_obj <- readRDS(file.path(PATH_SIMS, "design_params.rds"))
@@ -51,16 +62,22 @@ scenarios_df <- purrr::map_dfr(
   \(s) tibble::tibble(scenario = s$name, hr_true = s$hr)
 )
 
+# Stride-assign sim_ids to shards so each shard gets a near-equal subset.
+# sim_id seeds are still derived from the original sim_id (line below), so
+# the union of all shard outputs is identical to a single un-sharded run.
+all_sim_ids       <- seq_len(n_sims)
+this_shard_simids <- all_sim_ids[((all_sim_ids - 1L) %% total_shards) + 1L == shard_id]
+
 grid <- tidyr::expand_grid(
   scenarios_df,
   design = c("fixed", "adaptive"),
-  sim_id = seq_len(n_sims)
+  sim_id = this_shard_simids
 ) |>
   dplyr::mutate(
     seed = CONFIG$simulation$seed + sim_id * 10L + as.integer(factor(design))
   )
 
-cli::cli_alert_info("Total simulations to run      = {nrow(grid)}")
+cli::cli_alert_info("Total simulations to run      = {nrow(grid)} (this shard)")
 
 # --- dispatcher: route one row to the appropriate simulator ------------------
 # Error-row builders (.error_row_fixed / .error_row_adaptive) come from
@@ -131,13 +148,14 @@ if (n_errors > 0) {
   cli::cli_alert_success("0 simulation errors")
 }
 
-# --- save one RDS per (scenario, design) ------------------------------------
+# --- save one RDS per (scenario, design), suffixed with shard if applicable --
+shard_suffix <- if (total_shards > 1L) sprintf("_shard%d", shard_id) else ""
 results |>
   dplyr::group_by(scenario, design) |>
   dplyr::group_walk(\(df, key) {
     out_path <- file.path(
       PATH_SIMS,
-      sprintf("raw_%s_%s.rds", key$scenario, key$design)
+      sprintf("raw_%s_%s%s.rds", key$scenario, key$design, shard_suffix)
     )
     # group_walk strips the group columns from df; bind them back so the saved
     # tibble is self-describing.
