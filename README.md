@@ -6,7 +6,7 @@
 
 **📄 Read the report:**
 - **[Rendered PDF](report/index.pdf)** — full main report, rendered inline by GitHub
-- **HTML version** at `https://kbd0011.github.io/bayesian-adaptive-trial-sim/` (live once published via the included GitHub Pages workflow)
+- **[HTML version](https://kbd0011.github.io/bayesian-adaptive-trial-sim/)** — same content as the PDF, served via GitHub Pages
 - Source: [`report/index.qmd`](report/index.qmd) (main), [`report/sap_section.qmd`](report/sap_section.qmd) (mock SAP)
 
 ## Headline result
