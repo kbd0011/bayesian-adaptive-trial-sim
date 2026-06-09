@@ -1,0 +1,466 @@
+---
+title: "Bayesian Adaptive Phase II Oncology Trial"
+subtitle: "Operating characteristics, real-data validation, and a mock SAP"
+author: "Cris Taylor"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 5
+  pdf:
+    toc: true
+    toc-depth: 3
+    geometry: margin=1in
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(here)
+  library(dplyr)
+  library(tibble)
+  library(knitr)
+  library(flextable)
+})
+source(here("R", "00_setup.R"))
+oc       <- readRDS(file.path(PATH_SIMS, "oc_table.rds"))
+design   <- readRDS(file.path(PATH_SIMS, "design_params.rds"))
+cox_obj  <- readRDS(file.path(PATH_SIMS, "tcga_cox_model.rds"))
+km_tbl   <- read.csv(file.path(PATH_TBL, "tcga_km_summary.csv"))
+cox_tbl  <- read.csv(file.path(PATH_TBL, "tcga_cox_results.csv"))
+aft_tbl  <- read.csv(file.path(PATH_TBL, "tcga_bayes_aft_summary.csv"))
+```
+
+## Executive summary {.unnumbered}
+
+We simulated 12,000 Phase II oncology trials (1,000 per scenario × 2 designs)
+under 6 prior scenarios spanning hazard ratios (HR) from harmful (1.15) to
+strongly beneficial (0.55). A Bayesian response-adaptive design with one
+event-driven interim futility look (30% information time under the design
+alternative HR = 0.70, fires when 12 events accumulate) was compared
+against a fixed group-sequential O'Brien-Fleming design that applies the
+identical final-stage z-boundary. The adaptive design controlled Type I
+error at **0.019** (vs 0.021 for fixed; both below the 0.025 one-sided
+target), stopped early for futility in **48% of trials under harmful HR**
+and **36% under the null** (5–8% expected sample-size savings in those
+scenarios), and ceded **0.6–5.6 percentage points of power** to the fixed
+design across non-null effects. A parallel survival analysis on
+n = 1,002 TCGA-BRCA patients exercised the same survival toolkit on real
+data: Cox PH and a Bayesian Weibull AFT directionally agree that
+hormone-receptor positive status is protective (HR ≈ 0.58–0.70) and that
+each decade of age increases hazard (HR ≈ 1.17–1.28), with a Schoenfeld
+test flagging a proportional-hazards violation that motivates the
+parametric AFT cross-check.
+
+## 1. Introduction
+
+Phase II oncology programs face a power–efficiency trade-off: fixed designs
+with adequate power are routinely overpowered for harmful or null effects,
+exposing more patients than necessary to an ineffective experimental
+therapy. Bayesian adaptive designs with response-adaptive randomization
+(RAR) and futility interim looks are now recognized in the FDA
+*Adaptive Designs for Clinical Trials of Drugs and Biologics* (2019)
+guidance as appropriate tools, provided that operating characteristics are
+demonstrated by simulation under all plausible scenarios.
+
+This report quantifies the operating characteristics of one such design
+against a fixed alternative for a hypothetical time-to-progression endpoint,
+and demonstrates the same survival analytic toolkit on real breast-cancer
+data from TCGA-BRCA.
+
+## 2. Estimand (ICH E9(R1))
+
+The primary estimand follows the ICH E9(R1) five-attribute structure.
+A "treatment policy" strategy is used for the most operationally common
+intercurrent event (treatment discontinuation), which is consistent with
+the FDA's most-frequent recommendation for exploratory Phase II oncology
+trials.
+
+```{r estimand-table}
+estimand <- tibble::tribble(
+  ~Attribute,                ~Specification,
+  "Treatment",               "Experimental therapy vs standard-of-care control, both administered until disease progression, unacceptable toxicity, or withdrawal of consent.",
+  "Population",              "Patients with the target indication meeting protocol-defined eligibility.",
+  "Endpoint (variable)",     "Time from randomization to progression or death from any cause (PFS).",
+  "Intercurrent events",     "Treatment discontinuation handled via treatment-policy strategy: events occurring after discontinuation are included in the analysis.",
+  "Population-level summary","Hazard ratio (experimental vs control) at the end of follow-up."
+)
+flextable::flextable(estimand) |>
+  flextable::theme_booktabs() |>
+  flextable::autofit() |>
+  flextable::fontsize(size = 10, part = "all")
+```
+
+## 3. Trial designs compared
+
+| Feature | Fixed design | Adaptive design |
+|---|---|---|
+| Max sample size | 120 (60 / arm) | 120 |
+| Allocation | 1:1 throughout | 1:1 until interim; RAR after |
+| Interim look | None | Event-driven: fires when 12 observed events accumulate (30% information under H1) |
+| Interim futility rule | — | Stop if P(HR < 0.7 \| data) < 0.20 |
+| Final test statistic | Cox PH `z = -log_hr / se` | Cox PH `z = -log_hr / se` |
+| Decision boundary | OBF z = 1.969 (final stage) | OBF z = 1.969 (final stage; no efficacy stopping at interim) |
+| RAR scheme | — | Thompson-style: `alloc_treat = max(0.2, min(0.8, sqrt(P(treat better))))`, refit every 20 enrollees post-interim |
+
+The adaptive design's interim Bayesian model is an exponential survival
+model with weakly informative priors centered on the baseline truth:
+`λ_c ~ Gamma(2, 80)` (E[λ_c] = 0.025/month, matching the data-generating
+control hazard) and `log HR ~ N(0, 1)`.
+
+## 4. Simulation methods
+
+**Data-generating model.** Patients enroll at rate 12/month
+(Exp(1/12) inter-arrival times). Event times are exponential with control
+monthly hazard 0.025 (annual hazard 0.30) and treatment hazard scaled by
+the scenario's true HR. Administrative censoring is applied at 24 months
+from study start.
+
+**Scenarios.** Six prior scenarios spanning the relevant HR range:
+
+```{r scenarios-table}
+oc |>
+  dplyr::filter(design == "fixed") |>
+  dplyr::transmute(scenario, hr_true,
+                   description = c("Treatment harms (HR > 1)",
+                                   "No effect (null, alpha control)",
+                                   "Modest treatment benefit",
+                                   "Moderate treatment benefit",
+                                   "Strong treatment benefit",
+                                   "Very strong treatment benefit")) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit()
+```
+
+**Reproducibility.** All randomness is seeded from `CONFIG$simulation$seed`
+(20260513) with per-sim seeds derived as
+`seed + sim_id * 10 + as.integer(factor(design))`. Each (scenario × design)
+cell runs 1,000 sims, stride-split across 10 parallel GitHub Actions matrix
+shards (each shard does 100 sims with seeds inherited from the original
+un-sharded design, so the union is byte-identical to a single big run).
+`furrr::future_pmap()` parallelizes within each shard over two worker
+processes; the full 12,000-sim publish run completes in a few minutes.
+
+## 5. Operating characteristics
+
+```{r oc-table}
+oc |>
+  dplyr::mutate(
+    `Pr(reject) ± MCSE` = sprintf("%.3f ± %.4f", reject_rate, mcse_reject),
+    `95% CI`     = sprintf("(%.3f, %.3f)", reject_ci_lo, reject_ci_hi),
+    `Pr(futility)` = ifelse(is.na(p_futility_stop), "—",
+                             sprintf("%.2f", p_futility_stop)),
+    `E[N] ± MCSE` = sprintf("%.1f ± %.2f", e_n, mcse_e_n),
+    `E[events]`  = sprintf("%.1f", e_events),
+    `Mean HR`    = sprintf("%.3f", mean_hr_est),
+    `Bias log-HR` = sprintf("%+.3f", bias_log_hr)
+  ) |>
+  dplyr::select(scenario, design, hr_true, `Pr(reject) ± MCSE`, `95% CI`,
+                `Pr(futility)`, `E[N] ± MCSE`, `E[events]`, `Mean HR`, `Bias log-HR`) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit() |>
+  flextable::fontsize(size = 9, part = "all")
+```
+
+Monte Carlo standard errors (MCSE) are reported alongside point estimates so the precision of each operating characteristic is explicit. For binomial proportions (rejection rate, futility probability) MCSE = √(p(1-p)/n); for expected sample size MCSE = SD/√n. At n = 1,000 sims per cell, the MCSE on a Type I error around 0.02 is ≈ 0.004.
+
+### 5.1 Power curve
+
+::: {layout-ncol=1}
+![Rejection rate by scenario and design with exact 95% binomial CIs.
+The adaptive design (red) is 1–5 percentage points below fixed (blue) at
+every non-null effect, the cost of stopping for futility under the
+alternative.](../outputs/figures/oc_power_curve.pdf)
+:::
+
+### 5.2 Expected sample size
+
+::: {layout-ncol=1}
+![The adaptive design enrolls ~10 fewer patients on average under harmful
+and null scenarios (futility stops cut enrollment short); savings shrink
+as the true effect strengthens.](../outputs/figures/oc_expected_n.pdf)
+:::
+
+### 5.3 Probability of futility stop
+
+::: {layout-ncol=1}
+![Adaptive design only. Futility stop probability is highest under
+harmful (17%) and null (12%) and drops to 3% under very-strong effect —
+the design correctly distinguishes signal from noise even on the limited
+information available at 50% enrollment.](../outputs/figures/oc_futility_stop.pdf)
+:::
+
+### 5.4 Summary heatmap
+
+::: {layout-ncol=1}
+![All six metrics tiled by scenario and faceted by design. Side-by-side
+comparison makes the operational vs statistical trade-off visible at a
+glance.](../outputs/figures/oc_summary_heatmap.pdf)
+:::
+
+### 5.5 Group-sequential boundary cross-validation
+
+The R `{rpact}` design (k = 2 stages, O'Brien-Fleming alpha spending,
+one-sided α = 0.025, 80% power) yields the following stage-wise
+boundaries:
+
+```{r design-boundaries}
+design$boundaries_tbl |>
+  dplyr::mutate(
+    across(c(efficacy_z_boundary, futility_z_boundary,
+             cumulative_alpha_spent, cumulative_beta_spent),
+           ~ sprintf("%.4f", .))
+  ) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit()
+```
+
+The companion `sas/seqdesign.sas` produces the same boundaries via PROC
+SEQDESIGN with identical alpha/beta-spending settings, verifying the
+design specification across the R and SAS implementations.
+
+![Alpha-spending function (and futility-spending boundary) from rpact.](../outputs/figures/alpha_spending.pdf)
+
+## 6. Real-data case study: TCGA-BRCA
+
+The same survival analytic pipeline (KM + Cox PH + Bayesian AFT) is
+exercised on overall survival in n = 1,002 TCGA-BRCA patients (97 events,
+median follow-up 487 days), stratified by hormone-receptor (HR) status.
+This demonstrates that the toolkit works on real, messier data; it does
+**not** validate the simulator's data-generating model, since the
+endpoint (overall survival in breast cancer) and population differ
+substantially from the simulator's hypothetical time-to-progression
+oncology trial.
+
+### 6.1 Kaplan-Meier
+
+```{r km-table}
+km_tbl |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit()
+```
+
+![KM curves with log-rank p (HR+ enjoys longer survival), 95% confidence
+bands, and risk table.](../outputs/figures/tcga_km.pdf)
+
+### 6.2 Cox proportional hazards
+
+```{r cox-table}
+cox_tbl |>
+  dplyr::mutate(across(where(is.numeric), ~ signif(., 3))) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit()
+```
+
+HR+ status reduces the hazard of death by ~42% (HR 0.58, 95% CI
+0.40–0.84); each decade of age at diagnosis raises the hazard by ~28%
+(HR 1.28, 95% CI 1.10–1.49). The Schoenfeld residual test flags the PH
+assumption for `hr_status` (p = 0.013):
+
+![Schoenfeld residuals.](../outputs/figures/tcga_cox_schoenfeld.pdf)
+
+A stratified Cox model (stratifying on `hr_status` to relax the PH
+assumption) was fit as a sensitivity analysis and retains a significant
+age-decade effect (HR 1.29 per decade, p = 0.001).
+
+### 6.3 Bayesian Weibull AFT — parametric cross-check
+
+The PH violation motivates a parametric AFT model that does not require
+proportional hazards. A Weibull AFT was fit in Stan (4 chains × 2,000
+iterations, max R̂ = 1.003, min bulk ESS = 1,598):
+
+```{r aft-table}
+aft_tbl |>
+  dplyr::filter(variable %in% c("intercept", "beta[1]", "beta[2]",
+                                "time_ratio[1]", "time_ratio[2]", "shape")) |>
+  dplyr::mutate(across(where(is.numeric), ~ signif(., 3))) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit()
+```
+
+When AFT time ratios are inverted (`HR = 1 / time_ratio` is the strict
+Weibull proportional-hazards correspondence, valid only under both PH
+and a Weibull baseline), the Cox and Bayesian estimates agree
+**directionally** but differ on the point-estimate scale: HR+ vs HR-
+0.58 (Cox, 95% CI 0.40–0.84) vs 0.70 (Bayes 1/TR, 95% CrI 0.54–0.93).
+The gap is the expected behavior when PH is violated — Cox estimates a
+time-averaged hazard ratio while the AFT-derived HR holds only under
+the parametric assumption. Both methods agree that HR+ status is
+significantly protective and that each decade of age is significantly
+risk-amplifying. The 95% intervals overlap modestly, not extensively,
+so the agreement is informative rather than reassuring.
+
+![Forest plot: Bayesian AFT (HR scale) vs Cox PH point estimates with
+95% intervals.](../outputs/figures/tcga_aft_vs_cox_forest.pdf)
+
+A posterior-predictive KM overlay confirms the Weibull fit visually:
+
+![Posterior-predictive KM overlay; observed survival (dark) sits within
+the envelope of 50 model-simulated replicate trials.](../outputs/figures/tcga_aft_ppc.pdf)
+
+R̂ histogram for all model parameters:
+
+![R̂ convergence diagnostic.](../outputs/figures/tcga_aft_rhat.pdf)
+
+## 7. Discussion
+
+**The adaptive design's value is operational, not statistical.** Across
+non-null effects, peak power is 0.6–5.6 percentage points lower than the
+fixed design. The real benefit is enrollment savings under harmful and
+null scenarios: a 48% probability of stopping for futility under
+HR = 1.15 and a 36% probability under the null mean the adaptive design
+spares enrollment in roughly four out of ten futile trials — a
+clinically and ethically relevant outcome the fixed design cannot
+deliver.
+
+**The interim is event-driven at 30% information under H1.** Triggering
+the interim when 12 observed events accumulate (≈ 30% of expected events
+under HR = 0.70) places the analysis inside the practical event-accrual
+window for an n = 120 / 24-month trial. A 50% information target was
+considered but, at the chosen sample size and event rate, almost never
+accumulated before end-of-study, reducing the design to "fixed with a
+near-dead futility check." Sensitivity analysis across alternative
+information fractions is on the roadmap (see Limitations).
+
+**Cox PH and Bayesian Weibull AFT directionally agree on TCGA-BRCA.**
+Both methods find HR+ status significantly protective and each decade
+of age significantly risk-amplifying. Point estimates differ on the HR
+scale (Cox 0.58 vs Bayes 1/TR 0.70 for HR+ vs HR-) because the strict
+`HR = 1/TR` correspondence holds only under both PH and Weibull
+baseline assumptions; Cox estimates a time-averaged HR while the
+parametric AFT does not. The agreement is therefore informative,
+demonstrating that conclusions are robust to the modeling family, but
+should not be over-interpreted as numerical concordance.
+
+**Bias in the adaptive HR estimator.** Both designs produce biased
+log-HR estimates, but in opposite directions:
+
+```{r bias-table}
+oc |>
+  dplyr::transmute(scenario, design, hr_true,
+    `bias log-HR` = sprintf("%+.3f", bias_log_hr),
+    `mean HR_est` = sprintf("%.3f", mean_hr_est),
+    `true HR`     = sprintf("%.2f", hr_true)
+  ) |>
+  dplyr::arrange(design, dplyr::desc(hr_true)) |>
+  flextable::flextable() |>
+  flextable::theme_booktabs() |>
+  flextable::autofit() |>
+  flextable::fontsize(size = 9, part = "all")
+```
+
+The fixed design shows the familiar small-sample Cox attenuation —
+log-HR estimates pulled toward 0 (HR toward 1), magnitude 0.01–0.03,
+direction independent of scenario. Standard, expected, and benign.
+
+The adaptive design shows a **larger positive bias** in log-HR (0.03–0.09)
+that **decreases as the true effect strengthens**. Two mechanisms
+contribute:
+
+1. **Futility-stop reporting.** When a trial stops at interim, the
+   reported HR is the posterior median from the interim Bayesian fit
+   (Cox PH on the few-event interim data is unstable; see R/03 comments).
+   The posterior is informed by a `N(0, 1)` log-HR prior — moderately
+   weak but non-trivial when only ~12 events have accumulated. The
+   posterior median is therefore pulled toward HR = 1, regardless of
+   the data's true direction. Under harmful HR this drags the
+   distribution of reported HRs toward 1 (away from the truth of 1.15);
+   under benefit, futility rarely fires, so the contribution is small.
+2. **RAR allocation-imbalance under benefit.** Post-interim
+   randomization allocates more to the apparently-winning arm. Under
+   a true benefit, this increases events in the treatment arm
+   disproportionately to control, modestly inflating the Cox HR
+   estimate vs the unbiased target. The effect is bounded by the
+   20/80 allocation caps but is still visible in the
+   strong/very-strong scenarios.
+
+The bias is **small relative to the effect sizes being estimated** —
+roughly 5% of `log(HR_true)` for the very-strong scenario, growing
+to a larger fraction under null/harmful where the truth is itself
+near 1. In a real submission this magnitude is reportable but not
+disqualifying; an IPTW-weighted sensitivity analysis would be the
+standard companion.
+
+**Regulatory framing.** Per FDA *Adaptive Designs for Clinical Trials of
+Drugs and Biologics* (2019), §IV.A, an adaptive design submission needs
+(i) pre-specified rules, (ii) Type I error control demonstrated by
+simulation, (iii) bias quantified in the effect estimator. This report
+provides all three: Type I is 0.019 (below the 0.025 nominal), the OBF
+boundary is published in advance, and the table above is the bias
+characterization required by (iii).
+
+## 8. Limitations and design choices
+
+- **Phase II screening design.** Maximum n = 120 with 24-month follow-up
+  is deliberately small for a Phase II go/no-go trial; rpact's
+  `getSampleSizeSurvival` says n ≈ 791 would be needed for 80% power at
+  HR = 0.70 under this alpha-spending. Power at smaller effect sizes
+  (HR 0.75 / 0.85) is correspondingly modest. This is by design, not a
+  misconfiguration — a confirmatory trial would scale up.
+- **Futility threshold (P(HR < 0.7 | data) < 0.20) is operator-defined.**
+  A formal sensitivity analysis across alternative thresholds is on the
+  roadmap.
+- **Cox PH on adaptive-trial data does not adjust for RAR-induced
+  allocation imbalance.** The empirical Type I (0.019) is below the
+  0.025 nominal, so this is not a regulatory dealbreaker, but in a real
+  submission an IPTW-weighted sensitivity analysis would accompany the
+  primary Cox PH.
+- **TCGA-BRCA is a toolkit validation, not a data-generating-model
+  validation.** Overall survival in breast cancer differs in endpoint,
+  population, and hazard shape from the simulator's hypothetical
+  time-to-progression trial. The TCGA section demonstrates that the
+  same Stan / KM / Cox / AFT pipeline works on real, messier data — not
+  that the simulator's exponential data-generating model matches breast
+  cancer biology.
+- **Stan compilation in `testthat::test_dir` is fragile.** Sourcing
+  rstan-heavy files repeatedly in one R process triggered "parser
+  failed badly" / C-stack errors; tests therefore run each file in its
+  own Rscript subprocess (`tests/testthat.R`).
+
+## 9. SAP excerpt
+
+A standalone mock Statistical Analysis Plan section is in
+`report/sap_section.qmd` (rendered separately). It follows the standard
+ICH E9-aligned outline (objectives, estimand, hypotheses, sample size,
+primary analysis, missing-data handling, sensitivity analyses, safety).
+
+## 10. Reproducibility
+
+```bash
+make sims     # runs all 12,000 trial simulations (~100 s, 4 workers)
+make tcga     # fits KM, Cox, Bayes AFT on TCGA-BRCA (~30 s)
+make report   # renders this document and sap_section.qmd
+make all      # the lot
+```
+
+Random seeds are derived from `CONFIG$simulation$seed = 20260513`. CI runs
+a reduced (`--n-sims 100`) version of the pipeline on every push.
+
+## 11. References
+
+- ICH E9(R1) — *Statistical Principles for Clinical Trials, Addendum on
+  Estimands and Sensitivity Analyses*, 2019.
+- FDA — *Adaptive Designs for Clinical Trials of Drugs and Biologics*,
+  Guidance for Industry, November 2019.
+- O'Brien PC, Fleming TR — A multiple testing procedure for clinical
+  trials. *Biometrics* 1979; 35: 549–556.
+- Cox DR — Regression models and life-tables. *J R Stat Soc B* 1972;
+  34: 187–220.
+- Wassmer G, Brannath W — *Group Sequential and Confirmatory Adaptive
+  Designs in Clinical Trials*. Springer, 2016. (Background for `{rpact}`.)
+- Stan Development Team — *Stan Reference Manual*, v2.32, 2023.
+- TCGA-BRCA: The Cancer Genome Atlas Network. *Comprehensive molecular
+  portraits of human breast tumours.* Nature 2012; 490: 61–70.
