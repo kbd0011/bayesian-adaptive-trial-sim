@@ -65,7 +65,7 @@ jobs:
         run: Rscript R/01_design_params.R
 
       - name: Run sim shard ${{ matrix.shard }}/10
-        run: Rscript R/04_run_all_sims.R --n-sims 10000 --workers 2 --shard-id ${{ matrix.shard }} --total-shards 10
+        run: Rscript R/04_run_all_sims.R --n-sims 1000 --workers 2 --shard-id ${{ matrix.shard }} --total-shards 10
 
       - name: Upload shard output
         uses: actions/upload-artifact@v4

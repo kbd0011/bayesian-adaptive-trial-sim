@@ -40,7 +40,7 @@ aft_tbl  <- read.csv(file.path(PATH_TBL, "tcga_bayes_aft_summary.csv"))
 
 ## Executive summary {.unnumbered}
 
-We simulated 120,000 Phase II oncology trials (10,000 per scenario × 2 designs)
+We simulated 12,000 Phase II oncology trials (1,000 per scenario × 2 designs)
 under 6 prior scenarios spanning hazard ratios (HR) from harmful (1.15) to
 strongly beneficial (0.55). A Bayesian response-adaptive design with one
 event-driven interim futility look (30% information time under the design
@@ -143,11 +143,11 @@ oc |>
 **Reproducibility.** All randomness is seeded from `CONFIG$simulation$seed`
 (20260513) with per-sim seeds derived as
 `seed + sim_id * 10 + as.integer(factor(design))`. Each (scenario × design)
-cell runs 10,000 sims, stride-split across 10 parallel GitHub Actions matrix
-shards (each shard does 1,000 sims with seeds inherited from the original
+cell runs 1,000 sims, stride-split across 10 parallel GitHub Actions matrix
+shards (each shard does 100 sims with seeds inherited from the original
 un-sharded design, so the union is byte-identical to a single big run).
 `furrr::future_pmap()` parallelizes within each shard over two worker
-processes; the full 120,000-sim publish run completes in ~20 min wall time.
+processes; the full 12,000-sim publish run completes in a few minutes.
 
 ## 5. Operating characteristics
 
@@ -171,7 +171,7 @@ oc |>
   flextable::fontsize(size = 9, part = "all")
 ```
 
-Monte Carlo standard errors (MCSE) are reported alongside point estimates so the precision of each operating characteristic is explicit. For binomial proportions (rejection rate, futility probability) MCSE = √(p(1-p)/n); for expected sample size MCSE = SD/√n. At n = 10,000 sims per cell, MCSE on Type I error around 0.02 is ≈ 0.0014, comfortably under the 0.005 threshold typically required for design-paper claims.
+Monte Carlo standard errors (MCSE) are reported alongside point estimates so the precision of each operating characteristic is explicit. For binomial proportions (rejection rate, futility probability) MCSE = √(p(1-p)/n); for expected sample size MCSE = SD/√n. At n = 1,000 sims per cell, the MCSE on a Type I error around 0.02 is ≈ 0.004.
 
 ### 5.1 Power curve
 
