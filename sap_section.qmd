@@ -1,7 +1,7 @@
 ---
 title: "Statistical Analysis Plan (Mock Section)"
 subtitle: "Phase II Adaptive Oncology Trial — Time-to-Progression Endpoint"
-author: "Cris Taylor"
+author: "Kofi Buabeng"
 date: today
 format:
   html:
