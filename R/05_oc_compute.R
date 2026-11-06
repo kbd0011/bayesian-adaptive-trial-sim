@@ -6,7 +6,7 @@
 # Inputs  : outputs/sims/raw_<scenario>_<design>.rds (one per cell, 12 total)
 # Outputs : outputs/sims/oc_table.rds  (tibble for downstream code)
 #           outputs/tables/oc_table.csv (human-readable)
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

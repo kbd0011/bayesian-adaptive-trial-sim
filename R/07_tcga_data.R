@@ -4,7 +4,7 @@
 # Inputs  : RTCGA.clinical::BRCA.clinical (bundled with package)
 # Outputs : data/tcga_brca_clean.rds  (tibble: times, status, hr_status,
 #                                       er, pr, her2, age, age_decade, barcode)
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

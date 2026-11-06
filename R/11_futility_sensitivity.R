@@ -10,7 +10,7 @@
 #           outputs/tables/futility_sensitivity.csv (aggregated table)
 #           outputs/figures/futility_sensitivity.{pdf,png}
 # CLI     : --n-sims N  (default 300)
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

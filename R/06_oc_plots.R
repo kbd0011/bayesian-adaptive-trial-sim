@@ -6,7 +6,7 @@
 #             4. oc_summary_heatmap.pdf (all metrics tiled, faceted by design)
 # Inputs  : outputs/sims/oc_table.rds
 # Outputs : 4 PDFs in outputs/figures/ (8x6 in, 300 DPI)
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

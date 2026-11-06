@@ -7,7 +7,7 @@
 # Outputs : outputs/tables/tcga_cox_results.csv
 #           outputs/figures/tcga_cox_schoenfeld.pdf
 #           outputs/sims/tcga_cox_model.rds
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

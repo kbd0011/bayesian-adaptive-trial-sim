@@ -4,7 +4,7 @@
 # Inputs  : data/tcga_brca_clean.rds
 # Outputs : outputs/figures/tcga_km.pdf
 #           outputs/tables/tcga_km_summary.csv
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

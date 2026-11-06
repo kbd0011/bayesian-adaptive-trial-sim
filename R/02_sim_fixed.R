@@ -5,7 +5,7 @@
 # Inputs  : function arguments (no file I/O).
 # Outputs : 1-row tibble: sim_id, design, seed, hr_true, n_used, n_events,
 #           hr_est, log_hr_est, pvalue_logrank, decision, runtime_sec.
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

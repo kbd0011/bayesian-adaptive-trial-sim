@@ -7,7 +7,7 @@
 # Outputs : outputs/sims/design_params.rds        (rpact design object + extras)
 #           outputs/tables/design_boundaries.csv  (tidy stage summary)
 #           outputs/figures/alpha_spending.pdf    (alpha-spending function)
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@
 #           Every other R script begins with: source(here::here("R/00_setup.R"))
 # Inputs  : config.yml
 # Outputs : CONFIG list in calling env; PATH_* path constants; logging helpers.
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

@@ -11,7 +11,7 @@
 #           --total-shards N total number of shards (default 1 = no sharding)
 # Usage   : Rscript R/04_run_all_sims.R --n-sims 100
 #           Rscript R/04_run_all_sims.R --n-sims 10000 --shard-id 3 --total-shards 10
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

@@ -11,8 +11,8 @@ abstract: >-
   PROC LIFETEST / PROC PHREG. Operating characteristics derived from
   12,000 simulated trials.
 authors:
-  - family-names: Taylor
-    given-names: Cris
+  - family-names: Buabeng
+    given-names: Kofi
 type: software
 license: MIT
 keywords:

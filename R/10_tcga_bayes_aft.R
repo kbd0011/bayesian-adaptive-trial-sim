@@ -10,7 +10,7 @@
 #           outputs/figures/tcga_aft_rhat.pdf
 #           outputs/figures/tcga_aft_vs_cox_forest.pdf
 #           outputs/figures/tcga_aft_ppc.pdf
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 

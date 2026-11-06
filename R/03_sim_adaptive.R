@@ -10,7 +10,7 @@
 # Outputs : 1-row tibble; columns mirror sim_fixed_trial() plus
 #           interim_decision, interim_n_events, final_alloc_ratio,
 #           n_refits, p_hr_lt_07_interim.
-# Author  : Cris Taylor
+# Author  : Kofi Buabeng
 # Date    : 2026-05-14
 # -----------------------------------------------------------------------------
 
