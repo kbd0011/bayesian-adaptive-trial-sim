@@ -8,6 +8,7 @@ format:
     toc: true
     toc-depth: 3
     theme: cosmo
+    format-links: false
   pdf:
     toc: true
     geometry: margin=1in
@@ -101,8 +102,8 @@ proportional hazards.
 - $H_1$: $HR < 1$ (experimental therapy reduces hazard of PFS event)
 
 The hypothesis is tested at a **one-sided significance level of 0.025** using
-a stratified log-rank test (with the Cox-PH-derived z-statistic compared
-against the stage 2 O'Brien-Fleming efficacy boundary).
+the Cox-PH-derived z-statistic for treatment, compared against the stage 2
+O'Brien-Fleming efficacy boundary (Section 7.1).
 
 ## 5. Analysis populations
 
@@ -131,8 +132,9 @@ reject moderate effect sizes. A confirmatory Phase III would scale up.
 The selected design achieves the following operating characteristics
 in the simulation report (`report/index.qmd`):
 
-- **Type I error (one-sided)**: 0.019 (adaptive) / 0.021 (fixed), both
-  below the 0.025 nominal level.
+- **Type I error (one-sided), estimated from 1,000 simulated trials per
+  design**: 0.019 (adaptive, 95% CI 0.011–0.030) / 0.021 (fixed, 95% CI
+  0.013–0.032), against the 0.025 nominal level.
 - **Power across non-null effects** (adaptive design):
   - HR = 0.85: 7.5%
   - HR = 0.75: 13.9%
@@ -165,7 +167,7 @@ under the design alternative HR = 0.70, at one-sided $\alpha = 0.025$:
 
 - **Stage 1 (interim)**: trial may stop for futility (see Section 8) but
   not for efficacy. No efficacy z-boundary is applied at interim.
-- **Stage 2 (final)**: $z$-boundary = 1.969. Reject $H_0$ if the final
+- **Stage 2 (final)**: $z$-boundary = 1.960. Reject $H_0$ if the final
   Cox-derived z-statistic ($z = -\hat{\beta} / \mathrm{se}(\hat{\beta})$,
   where $\hat{\beta}$ is the log-HR estimate) exceeds the stage 2
   boundary AND the HR point estimate is below 1.
@@ -231,8 +233,9 @@ are documented in trial records for regulatory traceability.
 
 Full operating characteristics across six HR scenarios (1.15, 1.00, 0.85,
 0.75, 0.65, 0.55) are reported in `report/index.qmd` §5 and Figures
-5.1–5.4. Type I error is controlled at 0.019 under the null hypothesis
-(adaptive design) / 0.021 (fixed design), verified by 1,000 simulated
+5.1–5.4. The simulated Type I error under the null hypothesis is
+estimated at 0.019 (95% CI 0.011–0.030) for the adaptive design and
+0.021 (95% CI 0.013–0.032) for the fixed design, from 1,000 simulated
 trials per scenario (MCSE on Type I ≈ 0.004).
 
 ## 9. Handling of missing data and intercurrent events
@@ -274,19 +277,20 @@ unstratified analysis.
 ### 10.2 Bayesian Weibull AFT
 
 A parametric Weibull accelerated-failure-time model is fit to the same
-data as a parametric sensitivity analysis. Posterior medians and 95%
-credible intervals on the hazard ratio (computed as the inverse of the
-posterior time ratio) are reported. Agreement with the Cox PH estimate
-provides reassurance that the proportional-hazards assumption is not
-materially violated. This dual reporting is illustrated for TCGA-BRCA
-in `report/index.qmd` Section 6.3.
+data as a sensitivity analysis for the baseline-hazard specification.
+Posterior medians and 95% credible intervals for the time ratios are
+reported; the corresponding Weibull hazard ratio is $TR^{-\text{shape}}$.
+A Weibull model with a single shape parameter is itself a
+proportional-hazards model, so agreement with the Cox PH estimate does
+not test the PH assumption (Section 10.3 covers that). This dual
+reporting is illustrated for TCGA-BRCA in `report/index.qmd` Section 6.3.
 
 ### 10.3 Schoenfeld diagnostic
 
 The proportional-hazards assumption is formally tested via
 `survival::cox.zph()` using scaled Schoenfeld residuals. Any covariate
-with $p < 0.05$ is investigated graphically, and a stratified Cox model
-is fit as the sensitivity analysis if the global test is violated.
+with $p < 0.05$ is investigated graphically, and a Cox model stratified
+on that covariate is fit as the sensitivity analysis.
 
 ### 10.4 Alternative estimand: hypothetical strategy
 
@@ -301,7 +305,7 @@ The futility rule's threshold $\theta$ (`P(HR < 0.7 \mid data) < \theta`
 → stop) is an operator-defined parameter. We assessed sensitivity by
 sweeping $\theta \in \{0.10, 0.15, 0.20, 0.30\}$ across all six HR
 scenarios with 300 simulated trials per cell (`R/11_futility_sensitivity.R`,
-7,200 sims total, ~90 s wall time). Full results in
+7,200 sims total). Full results in
 `outputs/tables/futility_sensitivity.csv`; key findings:
 
 ```{r futility-sens-table}
@@ -329,15 +333,16 @@ $\theta$.](`r here::here('outputs','figures','futility_sensitivity.png')`)
 
 **Key findings.**
 
-- **Type I error is robust to the threshold.** Under the null,
-  rejection rate is 0.013–0.017 across the sweep — well below the
-  0.025 nominal at every threshold. Futility-only stopping is binding
-  (cannot reject H~0~), so increasing $\theta$ cannot inflate Type I.
+- **Type I error does not rise with the threshold.** Under the null,
+  the estimated rejection rate is 0.013–0.017 at every threshold (300
+  runs per cell, so these are coarse estimates). Futility-only stopping
+  is binding (a stopped trial cannot reject H~0~), so increasing
+  $\theta$ cannot inflate Type I.
 - **Power is essentially invariant to the threshold.** At very-strong
   benefit (HR = 0.55), reject rate is 39.3%–40.0% across $\theta$;
   at strong (HR = 0.65), 21.3%–22.7%. The differences are within MC
   noise for 300 sims (MC SE ~0.028).
-- **Pr(futility stop) scales linearly with $\theta$** under null and
+- **Pr(futility stop) rises steadily with $\theta$** under null and
   harmful (21% → 45% under null; 31% → 57% under harmful as $\theta$
   goes 0.10 → 0.30) and modestly under benefit (very-strong: 0.7% →
   7.7%).
@@ -346,8 +351,9 @@ $\theta$.](`r here::here('outputs','figures','futility_sensitivity.png')`)
   cumulative ethical benefit across many trials in a program.
 
 **Selected threshold ($\theta = 0.20$) is defensible.** The choice sits
-near the middle of the sweep and achieves a 48% futility-stop
-probability under harmful (vs 57% at $\theta = 0.30$) without any
+near the middle of the sweep and achieves a 46% futility-stop
+probability under harmful in the sweep (48% in the main 1,000-run
+simulation; 57% at $\theta = 0.30$) without any
 detectable power cost vs the more conservative $\theta = 0.10$. A more
 aggressive value (0.30) is plausible if maximum patient-sparing under
 no benefit is prioritized over a small probability of stopping under
