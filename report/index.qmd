@@ -180,8 +180,8 @@ Monte Carlo standard errors (MCSE) are reported alongside point estimates so the
 ::: {layout-ncol=1}
 ![Rejection rate by scenario and design with exact 95% binomial CIs.
 The two designs are within a point of each other at HR = 0.85; at
-HR 0.75–0.55 the adaptive design (red) is 0.7–5.6 percentage points below
-fixed (blue), the cost of stopping for futility under the alternative.](../outputs/figures/oc_power_curve.pdf)
+HR 0.75–0.55 the adaptive design (blue) is 0.7–5.6 percentage points below
+fixed (red), the cost of stopping for futility under the alternative.](../outputs/figures/oc_power_curve.png)
 :::
 
 ### 5.2 Expected sample size
@@ -189,7 +189,7 @@ fixed (blue), the cost of stopping for futility under the alternative.](../outpu
 ::: {layout-ncol=1}
 ![The adaptive design enrolls about 9 fewer patients on average under the
 harmful scenario and about 6.5 fewer under the null (futility stops cut
-enrollment short); savings shrink as the true effect strengthens.](../outputs/figures/oc_expected_n.pdf)
+enrollment short); savings shrink as the true effect strengthens.](../outputs/figures/oc_expected_n.png)
 :::
 
 ### 5.3 Probability of futility stop
@@ -198,7 +198,7 @@ enrollment short); savings shrink as the true effect strengthens.](../outputs/fi
 ![Adaptive design only. Futility stop probability is highest under
 harmful (48%) and null (36%) and drops to 6% under very-strong effect,
 so the rule separates no-benefit from strong-benefit scenarios using
-only the 12 events available at the interim.](../outputs/figures/oc_futility_stop.pdf)
+only the 12 events available at the interim.](../outputs/figures/oc_futility_stop.png)
 :::
 
 ### 5.4 Summary heatmap
@@ -206,7 +206,7 @@ only the 12 events available at the interim.](../outputs/figures/oc_futility_sto
 ::: {layout-ncol=1}
 ![All six metrics tiled by scenario and faceted by design. Side-by-side
 comparison makes the operational vs statistical trade-off visible at a
-glance.](../outputs/figures/oc_summary_heatmap.pdf)
+glance.](../outputs/figures/oc_summary_heatmap.png)
 :::
 
 ### 5.5 Group-sequential design boundaries

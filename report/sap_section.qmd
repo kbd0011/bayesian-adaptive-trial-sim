@@ -329,7 +329,7 @@ sens |>
 threshold $\theta$, by scenario. Top panel: stopping is highly
 responsive to $\theta$ under null/harmful scenarios; bottom panel:
 rejection rate is essentially invariant to
-$\theta$.](`r here::here('outputs','figures','futility_sensitivity.png')`)
+$\theta$.](../outputs/figures/futility_sensitivity.png)
 
 **Key findings.**
 
