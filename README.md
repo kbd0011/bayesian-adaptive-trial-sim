@@ -1,31 +1,31 @@
 # Bayesian Adaptive Phase II Oncology Trial Simulator
 
-> Response-adaptive randomization simulator for a Phase II oncology trial with a time-to-event primary endpoint and one event-driven interim futility analysis, plus a parallel survival analysis on TCGA-BRCA. End-to-end R + Stan + SAS, with a Quarto report and a mock SAP section in ICH E9(R1) estimand language.
+> Simulator for a Phase II oncology trial with a time-to-event primary endpoint. It compares a Bayesian adaptive design (one event-driven interim with a futility stop, then response-adaptive randomization) against a fixed 1:1 design, and runs a parallel survival analysis on TCGA-BRCA. Built in R and Stan, with a Quarto report, a mock SAP section in ICH E9(R1) estimand language, and SAS programs for cross-checking the design and survival analyses.
 
 ![Operating characteristics summary](outputs/figures/oc_summary_heatmap.png)
 
 **📄 Read the report:**
-- **[Rendered PDF](report/index.pdf)** - full main report, rendered inline by GitHub
-- **[HTML version](https://kbd0011.github.io/bayesian-adaptive-trial-sim/)** - same content as the PDF, served via GitHub Pages
+- **[Rendered report (HTML)](https://kbd0011.github.io/bayesian-adaptive-trial-sim/)** - full main report, served via GitHub Pages
+- **[Mock SAP section (HTML)](https://kbd0011.github.io/bayesian-adaptive-trial-sim/sap_section.html)**
 - Source: [`report/index.qmd`](report/index.qmd) (main), [`report/sap_section.qmd`](report/sap_section.qmd) (mock SAP)
 
 ## Headline result
 
-> 12,000 simulated trials (1,000 per scenario × 2 designs, ~100 s wall time, 4 furrr workers). The Bayesian adaptive design controlled **Type I at 0.019** (vs 0.021 for fixed; both ≤ 0.025 target) and stopped early for futility in **48% of trials under harmful HR** and **36% under the null**, saving 5–8% of expected sample size in those scenarios. Across non-null effects (HR 0.85 → 0.55), adaptive ceded **0.6–5.6 percentage points of power** to the fixed design - the standard adaptive-design trade-off between operational efficiency under no/harmful signal and peak power under strong signal.
+> 12,000 simulated trials (1,000 per scenario × 6 scenarios × 2 designs). The Bayesian adaptive design's estimated Type I error is **0.019** (95% CI 0.011–0.030) against a one-sided target of 0.025, versus 0.021 (0.013–0.032) for the fixed design. It stopped early for futility in **48% of trials under a harmful effect (HR 1.15)** and **36% under the null**, cutting expected sample size by 5–8% in those scenarios. Power was similar at HR 0.85 (0.075 adaptive vs 0.069 fixed), and the adaptive design gave up 0.7–5.6 percentage points of power at HR 0.75–0.55: the standard adaptive-design trade of some peak power for fewer patients enrolled when the therapy does not work.
 
 ## What this demonstrates
 
-- **Adaptive trial design** with an event-driven interim (30% information time under H1, fires when 12 events accumulate) and post-interim Thompson-style response-adaptive randomization (sqrt damping + 20/80 caps, refit every 20 enrollees).
-- **Frequentist group-sequential boundary** via `{rpact}` (O'Brien-Fleming alpha + beta spending), with both fixed and adaptive designs applying the same final-stage z-boundary (z = 1.969) for apples-to-apples comparison.
+- **Adaptive trial design** with an event-driven interim (fires when 12 events accumulate, 30% of the events expected under the design alternative HR = 0.70), a Bayesian futility rule (stop if P(HR < 0.7 | data) < 0.20), and post-interim Thompson-style response-adaptive randomization (sqrt damping + 20/80 caps, refit every 20 enrollees).
+- **Like-for-like comparison with a fixed design.** The fixed design randomizes 1:1 and has a single final analysis. Both designs test the final Cox z-statistic against the same final-stage efficacy boundary (z = 1.960), taken from a two-stage `{rpact}` O'Brien-Fleming design (alpha + beta spending).
 - **Bayesian exponential survival** at the interim, fit in Stan with a baseline-rate-centered Gamma prior on the control hazard. Compiled once, cached on disk, parallelized across `furrr` workers.
-- **Parallel survival analytics** on n = 1,002 TCGA-BRCA patients: Kaplan-Meier (with log-rank + risk table), Cox PH with Schoenfeld diagnostic, Bayesian Weibull AFT with posterior-predictive KM overlay.
-- **Two complementary survival models** (Cox PH non-parametric vs Weibull AFT parametric) directionally agree on the protective effect of hormone-receptor positive status and the risk-amplifying effect of age, despite a flagged proportional-hazards violation.
-- **Mock SAP section** in ICH E9(R1) estimand language and CDISC-aligned analysis-population structure.
-- **Reproducibility-as-code**: `Makefile`, `config.yml`, single-seed RNG, GitHub Actions CI running a reduced 100-sim version of the pipeline + the full TCGA analysis + unit tests + Quarto render on every push.
+- **Parallel survival analytics** on n = 1,002 TCGA-BRCA patients: Kaplan-Meier (with log-rank + risk table), Cox PH with a Schoenfeld diagnostic and a stratified sensitivity fit, and a Bayesian Weibull AFT with a posterior-predictive KM overlay.
+- **Two survival models, one conclusion.** Semi-parametric Cox PH and a parametric Bayesian Weibull AFT agree that hormone-receptor-positive status is protective and that each decade of age raises the hazard.
+- **Mock SAP section** in ICH E9(R1) estimand language, with ITT / mITT / safety analysis populations and a futility-threshold sensitivity sweep.
+- **Reproducibility as code**: `Makefile`, `config.yml`, seeded RNG, an `renv` lockfile, and two GitHub Actions workflows. CI runs a reduced 100-sim version of the pipeline, the full TCGA analysis, the unit tests and the Quarto render on each push to `main`; the publish workflow runs the full simulation in 10 shards and deploys the HTML report to GitHub Pages.
 
 ## Stack
 
-R 4.3 · Stan / `{rstan}` / `{rstanarm}` · `{rpact}` · `{gsDesign}` · `{survival}` · `{survminer}` · `{furrr}` · `{bayesplot}` · `{posterior}` · `{flextable}` · Quarto · SAS OnDemand for Academics
+R 4.3 · Stan / `{rstan}` · `{rpact}` · `{survival}` · `{survminer}` · `{furrr}` · `{bayesplot}` · `{posterior}` · `{flextable}` · Quarto · SAS (PROC SEQDESIGN / LIFETEST / PHREG programs)
 
 ## Repository structure
 
@@ -34,11 +34,11 @@ config.yml             all simulation + design parameters (no hard-coded numbers
 Makefile               make sims | tcga | report | test | all
 R/
   00_setup.R           libs, paths, future multisession, helpers
-  01_design_params.R   rpact OBF group-sequential design + interim event target
-  02_sim_fixed.R       fixed-design simulator (1:1, log-rank + Cox PH on OBF z)
+  01_design_params.R   rpact two-stage OBF design + interim event target
+  02_sim_fixed.R       fixed-design simulator (1:1, one final analysis, Cox z vs final OBF boundary)
   03_sim_adaptive.R    adaptive simulator with event-driven Bayesian interim + RAR
-  04_run_all_sims.R    furrr orchestrator (--n-sims, --workers CLI flags)
-  05_oc_compute.R      operating-characteristics aggregator
+  04_run_all_sims.R    furrr orchestrator (--n-sims, --workers, --shard-id CLI flags)
+  05_oc_compute.R      operating-characteristics aggregator (with MCSE)
   06_oc_plots.R        4 OC figures (power, E[N], futility, summary heatmap)
   07_tcga_data.R       TCGA-BRCA pull + clean (RTCGA::survivalTCGA)
   08_tcga_km.R         Kaplan-Meier by hormone-receptor status
@@ -49,15 +49,16 @@ stan/
   exp_survival.stan    interim Bayesian model (adaptive design)
   weibull_aft.stan     Weibull AFT model (TCGA case study)
 sas/
-  seqdesign.sas        PROC SEQDESIGN cross-check of rpact boundaries
-  tcga_lifetest.sas    PROC LIFETEST cross-check of survminer
-  tcga_phreg.sas       PROC PHREG cross-check of coxph (incl. PH assessment)
+  seqdesign.sas        PROC SEQDESIGN program for the design boundaries
+  tcga_lifetest.sas    PROC LIFETEST program mirroring R/08 (KM + log-rank)
+  tcga_phreg.sas       PROC PHREG program mirroring R/09 (Cox + PH assessment)
 report/
-  index.qmd            full Quarto report (10 sections, embeds 10 figures)
+  index.qmd            full Quarto report (11 sections, 10 figures)
   sap_section.qmd      standalone mock SAP, ICH E9(R1) estimand structure
 tests/                 testthat unit tests, run via per-file Rscript subprocesses
 .github/workflows/
-  ci.yml               full pipeline + tests + report render on every push
+  ci.yml               reduced pipeline + tests + report render on each push to main
+  publish.yml          sharded full simulation + render + deploy to GitHub Pages
 outputs/               figures (PDF + PNG) and tables (CSV)
 ```
 
@@ -75,10 +76,10 @@ renv::restore()
 Then:
 
 ```bash
-make sims         # 12,000 trial simulations (~100 s @ 4 workers)
+make sims         # 12,000 trial simulations (4 furrr workers by default)
 make tcga         # TCGA KM + Cox + Bayesian AFT pipeline (writes sas/data/tcga_brca.csv too)
 make sas-data     # just the CSV export, for SAS-only users
-make sensitivity  # futility-threshold sweep used in SAP §10.5 (~90 s)
+make sensitivity  # futility-threshold sweep used in SAP §10.5
 make report       # render Quarto report and SAP section
 make test         # testthat suite (per-file subprocess isolation)
 make all          # sims + tcga + report (sensitivity not included by default)
@@ -95,7 +96,7 @@ All randomness is seeded from `CONFIG$simulation$seed = 20260513` with per-sim s
 |----------|--------|---------|-------------|--------|-------------|------|-----------|---------|
 | null            | adaptive | 1.00 | 0.019 | (0.011, 0.030) | 0.36 | 113.5 | 32.8 | 1.16 |
 | null            | fixed    | 1.00 | 0.021 | (0.013, 0.032) | -    | 120.0 | 45.0 | 1.04 |
-| harmful         | adaptive | 1.15 | 0.008 | (0.003, 0.016) | 0.48 | 110.8 | 30.4 | 1.33 |
+| harmful         | adaptive | 1.15 | 0.008 | (0.003, 0.016) | 0.48 | 110.8 | 30.4 | 1.32 |
 | harmful         | fixed    | 1.15 | 0.010 | (0.005, 0.018) | -    | 120.0 | 47.4 | 1.20 |
 | mild            | adaptive | 0.85 | 0.075 | (0.059, 0.093) | 0.22 | 116.3 | 35.3 | 0.98 |
 | mild            | fixed    | 0.85 | 0.069 | (0.054, 0.087) | -    | 120.0 | 42.3 | 0.89 |
@@ -110,20 +111,24 @@ Full table: `outputs/tables/oc_table.csv`. Plots: `outputs/figures/oc_*.{pdf,png
 
 ## TCGA-BRCA case study (n = 1,002, 97 events)
 
-| Term | Cox PH (HR, 95% CI) | Bayes Weibull AFT (1/TR, 95% CrI) |
+| Term | Cox PH: HR (95% CI) | Bayesian Weibull AFT: time ratio (95% CrI) |
 |---|---|---|
-| HR+ vs HR- | 0.58 (0.40, 0.84) | 0.70 (0.54, 0.93) |
-| Age (per decade) | 1.28 (1.10, 1.49) | 1.17 (1.07, 1.29) |
+| HR+ vs HR- | 0.555 (0.36, 0.86) | 1.40 (1.07, 1.87) |
+| Age (per decade) | 1.28 (1.10, 1.49) | 0.85 (0.78, 0.94) |
 
-Both models agree **directionally**: HR+ is significantly protective and each decade of age significantly increases hazard. The point-estimate gap (Cox 0.58 vs Bayes 0.70 on the HR scale) is the expected behavior when proportional hazards is violated - Cox estimates a time-averaged HR while the Weibull AFT's `1/TR` correspondence to HR holds strictly only under both PH and a Weibull baseline. Schoenfeld test flags PH violation for `hr_status` (p = 0.013), so the disagreement is informative rather than reassuring. Bayes diagnostics: max R̂ = 1.003, min bulk ESS = 1,598, 4 chains × 2,000 iter in ~5 s each.
+Sources: `outputs/tables/tcga_cox_results.csv` and `outputs/tables/tcga_bayes_aft_summary.csv` (posterior medians). A time ratio above 1 means longer survival.
 
-## Limitations and design choices
+Both models find HR+ status significantly protective and each decade of age significantly risk-increasing; no interval includes the no-effect value, and the Kaplan-Meier log-rank test separates the receptor groups (p = 0.030). A Weibull model with a single shape parameter is also a proportional-hazards model, with hazard ratio TR^(−shape). Converted with the fitted shape (1.60, 95% CrI 1.41–1.81), the AFT effects land close to the Cox hazard ratios. So the comparison shows the effects do not depend on leaving the baseline hazard unspecified (Cox) versus modelling it as Weibull. It is not a check of proportional hazards: that is the Schoenfeld test, which flags receptor status, and `R/09` adds a Cox model stratified on receptor status as the sensitivity fit. Bayes diagnostics: max R̂ = 1.003, min bulk ESS = 1,598, 4 chains × 2,000 iterations.
+
+## Scope and limitations
 
 - **Phase II screening design.** Maximum n = 120 with 24-month follow-up is deliberately small for a Phase II go/no-go trial; rpact's sample-size calculator says n ≈ 791 would be needed for 80% power at HR = 0.70 with this alpha-spending. Power at smaller effect sizes (HR 0.75 / 0.85) is correspondingly modest. This is by design, not a misconfiguration.
+- **Simulation precision.** With 1,000 runs per scenario, the 95% CI on the adaptive Type I error (0.011–0.030) still includes the 0.025 target. A larger null-scenario run would narrow it.
 - **Interim timing chosen at 30% information under H1.** A 50% interim was originally specified but, at this n and event-rate envelope, almost never accumulated the target event count before end-of-study; 30% places the interim inside the practical event-accrual window. Sensitivity analysis across alternative information fractions is on the roadmap.
-- **Futility threshold (P(HR < 0.7 | data) < 0.20) is operator-defined.** A formal sensitivity analysis across alternative thresholds (0.10, 0.15, 0.30) is on the roadmap; the current threshold has not been swept.
+- **Futility threshold (P(HR < 0.7 | data) < 0.20) is operator-defined.** `R/11_futility_sensitivity.R` sweeps it over 0.10, 0.15, 0.20 and 0.30 (300 runs per cell, `outputs/tables/futility_sensitivity.csv`): futility stops rise with the threshold while power moves by less than the simulation error. Details in SAP §10.5.
 - **Adaptive HR estimates are biased upward** (mean log-HR bias +0.03 to +0.09, decreasing with stronger true effect) due to two mechanisms: (1) futility-stopped trials report the interim Bayesian posterior median, which is pulled toward HR = 1 by the weakly informative prior; (2) RAR-induced allocation imbalance modestly inflates the Cox HR estimate under benefit. The fixed design's bias is the standard small-sample Cox attenuation (-0.01 to -0.03), opposite direction. Quantified in `report/index.qmd` §7 (bias table by scenario × design); see `outputs/tables/oc_table.csv` `bias_log_hr` column. The Cox PH analysis does not adjust for RAR-induced imbalance - an IPTW-weighted sensitivity would be the standard regulatory companion.
-- **TCGA-BRCA is a survival toolkit validation, not a data-generating-model validation.** The endpoint (overall survival in breast cancer) differs from the simulator's (time-to-progression in a hypothetical oncology indication). The TCGA section demonstrates that the same Stan / KM / Cox / AFT pipeline works on real, messier data - not that the simulator's exponential data-generating model matches breast cancer biology.
+- **TCGA-BRCA tests the survival toolkit, not the data-generating model.** The endpoint (overall survival in breast cancer) differs from the simulator's (time-to-progression in a hypothetical oncology indication). The TCGA section demonstrates that the same Stan / KM / Cox / AFT pipeline works on real, messier data - not that the simulator's exponential data-generating model matches breast cancer biology.
+- **SAS programs are provided for cross-checking, without committed output.** `sas/seqdesign.sas` still specifies the original 50% interim, so it needs `info=cum(0.3 1.0)` before its boundaries can be compared with `outputs/tables/design_boundaries.csv`.
 
 
 ## Background

@@ -7,9 +7,9 @@ abstract: >-
   interim futility analysis. Includes a parallel survival analysis on
   TCGA-BRCA (Kaplan-Meier, Cox PH with Schoenfeld diagnostic, Bayesian
   Weibull AFT) and a mock SAP section in ICH E9(R1) estimand language.
-  R + Stan implementation cross-validated against SAS PROC SEQDESIGN /
-  PROC LIFETEST / PROC PHREG. Operating characteristics derived from
-  12,000 simulated trials.
+  Implemented in R and Stan, with SAS PROC SEQDESIGN / PROC LIFETEST /
+  PROC PHREG programs provided for cross-checking. Operating
+  characteristics estimated from 12,000 simulated trials.
 authors:
   - family-names: Buabeng
     given-names: Kofi
@@ -21,6 +21,5 @@ keywords:
   - response-adaptive randomization
   - survival analysis
   - ICH E9(R1)
-  - CDISC ADTTE
   - rstan
   - rpact
